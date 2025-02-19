@@ -42,7 +42,7 @@ func GetLastArg() string {
 }
 
 func CheckPremium() {
-	fmt.Println("Checking subscription before...")
+	color.Blue("Checking subscription before...")
 	var customerId string = os.Getenv("CUSTOMER_ID")
 
 	if customerId == "" {
@@ -82,4 +82,5 @@ func CheckPremium() {
 	}
 
 	color.Green("Subscription OK")
+	fmt.Println("")
 }

@@ -30,7 +30,7 @@ func NewClient() *Client {
 }
 
 func (c *Client) CheckConnection() {
-	fmt.Println("Checking connection...")
+	color.Blue("Checking connection...")
 
 	endpoint := "/api/v3/ping"
 	fullURL := fmt.Sprintf("%s%s", c.BaseURL, endpoint)
@@ -61,10 +61,11 @@ func (c *Client) CheckConnection() {
 	}
 
 	color.Green("Connection OK")
+	fmt.Println("")
 }
 
 func (c *Client) GetBalanceUSDT() float32 {
-	fmt.Println("Checking USDT balance...")
+	color.Blue("Checking USDT balance...")
 	endpoint := "/api/v3/account"
 	timestamp := time.Now().UnixMilli()
 
