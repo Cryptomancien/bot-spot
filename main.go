@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"main/commands"
+	"main/database"
 	"main/server"
 )
 
@@ -20,6 +21,7 @@ func menu() {
 func initialize() {
 	CreateConfigFileIfNotExists()
 	LoadDotEnv()
+	database.InitDatabase()
 }
 
 func main() {
