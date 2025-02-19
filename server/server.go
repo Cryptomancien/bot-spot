@@ -5,14 +5,13 @@ import (
 	"github.com/ostafen/clover"
 	"html/template"
 	"log"
+	"main/database"
 	"net/http"
 )
 
-// todo dynamic path
-
 func Serve() {
-	// Open database once at the start
-	db, err := clover.Open("cycles.db")
+	databasePath := database.GetDatabasePath()
+	db, err := clover.Open(databasePath)
 	if err != nil {
 		log.Fatal("Error opening database:", err)
 	}
