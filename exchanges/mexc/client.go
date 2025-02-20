@@ -26,7 +26,7 @@ func NewClient() *Client {
 	return &Client{
 		APIKey:    os.Getenv("MEXC_API_KEY"),
 		APISecret: os.Getenv("MEXC_SECRET_KEY"),
-		BaseURL:   "https://api.mexc.com",
+		BaseURL:   "https://api.mexc.co",
 	}
 }
 
@@ -34,110 +34,224 @@ func (c *Client) SetBaseURL(url string) {
 	c.BaseURL = url
 }
 
-func (c *Client) sign(query string) string {
-	h := hmac.New(sha256.New, []byte(c.APISecret))
-	h.Write([]byte(query))
-	return hex.EncodeToString(h.Sum(nil))
-}
+func (c *Client) CheckConnection() {
+	color.Blue("Checking connection...")
 
-func (c *Client) request(method, endpoint, queryString string) ([]byte, error) {
-	fullURL := fmt.Sprintf("%s%s?%s", c.BaseURL, endpoint, queryString)
-	req, err := http.NewRequest(method, fullURL, nil)
+	endpoint := "/api/v3/ping"
+	fullURL := fmt.Sprintf("%s%s", c.BaseURL, endpoint)
+
+	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
-		return nil, err
+		fmt.Println("Error creating request:", err)
+		os.Exit(0)
 	}
-	req.Header.Set("X-MEXC-APIKEY", c.APIKey)
 
-	client := &http.Client{}
+	// Perform the request
+	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		fmt.Println("Error making request:", err)
+		os.Exit(0)
 	}
+
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println("Error closing body:", err)
 		}
 	}(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP error: %d", resp.StatusCode)
+		os.Exit(0)
 	}
 
-	return io.ReadAll(resp.Body)
-}
-
-func (c *Client) CheckConnection() {
-	color.Blue("Checking connection...")
-	if _, err := c.request("GET", "/api/v3/ping", ""); err != nil {
-		log.Fatal("Connection failed:", err)
-	}
 	color.Green("Connection OK")
+	fmt.Println("")
 }
 
 func (c *Client) GetBalanceUSDT() float32 {
 	color.Blue("Checking USDT balance...")
+	endpoint := "/api/v3/account"
 	timestamp := time.Now().UnixMilli()
-	signature := c.sign(fmt.Sprintf("timestamp=%d", timestamp))
-	body, err := c.request("GET", "/api/v3/account", fmt.Sprintf("timestamp=%d&signature=%s", timestamp, signature))
+
+	// Construct the query string
+	queryString := fmt.Sprintf("timestamp=%d", timestamp)
+
+	// Generate HMAC-SHA256 signature
+	h := hmac.New(sha256.New, []byte(c.APISecret))
+	h.Write([]byte(queryString))
+	signature := hex.EncodeToString(h.Sum(nil))
+
+	// Build the full request URL
+	fullURL := fmt.Sprintf("%s%s?%s&signature=%s", c.BaseURL, endpoint, queryString, signature)
+
+	// Create the HTTP request
+	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
-		log.Fatal("Request failed:", err)
+		fmt.Println("Error creating request:", err)
 	}
+
+	// Set request headers
+	req.Header.Set("X-MEXC-APIKEY", c.APIKey)
+
+	// Execute the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Error making request:", err)
+		os.Exit(0)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Println("Error closing body:", err)
+		}
+	}(resp.Body)
+
+	// Read response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error reading response:", err)
+		os.Exit(0)
+	}
+	// {"makerCommission":null,"takerCommission":null,"buyerCommission":null,"sellerCommission":null,"canTrade":true,"canWithdraw":true,"canDeposit":true,"updateTime":null,"accountType":"SPOT","balances":[{"asset":"USDT","free":"25789.44","locked":"0"},{"asset":"SOL","free":"0.009678398","locked":"0"}],"permissions":["SPOT"]}
 
 	balances, _, _, err := jsonparser.Get(body, "balances")
 	if err != nil {
-		log.Fatal("Error parsing balances:", err)
+		log.Println("Error getting balances:", err)
+		os.Exit(0)
 	}
 
-	var balance float32
-	_, err = jsonparser.ArrayEach(balances, func(value []byte, _ jsonparser.ValueType, _ int, _ error) {
-		if asset, _ := jsonparser.GetString(value, "asset"); asset == "USDT" {
+	var freeFloat float32
+	_, err = jsonparser.ArrayEach(balances, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		asset, _ := jsonparser.GetString(value, "asset")
+		if asset == "USDT" {
 			freeStr, _ := jsonparser.GetString(value, "free")
 			free, _ := strconv.ParseFloat(freeStr, 32)
-			balance = float32(free)
+			if err != nil {
+				fmt.Println("Error converting free balance:", err)
+				os.Exit(0)
+			}
+
+			freeFloat = float32(free)
 		}
 	})
-	if err != nil {
-		return 0
-	}
 
-	return balance
+	return freeFloat
 }
 
 func (c *Client) GetLastPriceBTC() float32 {
 	fmt.Println("Getting last price...")
-	body, err := c.request("GET", "/api/v3/ticker/price", "symbol=BTCUSDT")
+
+	endpoint := "/api/v3/ticker/price"
+	symbol := "BTCUSDT"
+
+	// Build full URL
+	fullURL := fmt.Sprintf("%s%s?symbol=%s", c.BaseURL, endpoint, symbol)
+
+	// Create HTTP request
+	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
-		log.Fatal("Request failed:", err)
+		log.Fatal(err)
+		return 0
+	}
+
+	// Set headers if required
+	req.Header.Set("X-MEXC-APIKEY", c.APIKey)
+
+	// Execute request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("Error closing body:", err)
+		}
+	}(resp.Body)
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	priceStr, err := jsonparser.GetString(body, "price")
 	if err != nil {
 		log.Fatal("Error extracting price:", err)
+		return 0
 	}
 
-	price, _ := strconv.ParseFloat(priceStr, 32)
+	price, err := strconv.ParseFloat(priceStr, 32)
+	if err != nil {
+		log.Fatal("Error converting price:", err)
+		return 0
+	}
+
 	return float32(price)
 }
 
 func (c *Client) CreateOrder(side string, price, quantity float32) string {
-	fmt.Println("Creating order...")
+	endpoint := "/api/v3/order"
 	timestamp := time.Now().UnixMilli()
-	query := fmt.Sprintf("symbol=BTCUSDT&side=%s&type=LIMIT&timeInForce=GTC&quantity=%f&price=%f&timestamp=%d",
-		side, quantity, price, timestamp)
-	signature := c.sign(query)
 
-	body, err := c.request("POST", "/api/v3/order", fmt.Sprintf("%s&signature=%s", query, signature))
+	// Create query string
+	queryString := fmt.Sprintf("symbol=BTCUSDT&side=%s&type=LIMIT&timeInForce=GTC&quantity=%f&price=%f&timestamp=%d",
+		side, quantity, price, timestamp)
+
+	// Create HMAC-SHA256 signature
+	h := hmac.New(sha256.New, []byte(c.APISecret))
+	h.Write([]byte(queryString))
+	signature := hex.EncodeToString(h.Sum(nil))
+
+	// Build full URL
+	fullURL := fmt.Sprintf("%s%s?%s&signature=%s", c.BaseURL, endpoint, queryString, signature)
+
+	// Create HTTP request
+	req, err := http.NewRequest("POST", fullURL, nil)
 	if err != nil {
-		log.Fatal("Request failed:", err)
+		log.Fatal(err)
 	}
 
+	// Set headers
+	req.Header.Set("X-MEXC-APIKEY", c.APIKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	// Execute request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Fatal("Error closing body:", err)
+		}
+	}(resp.Body)
+
+	// Check if HTTP status code is OK (200-299)
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		fmt.Println("Error: Received non-OK HTTP status code:", resp.StatusCode)
+		return ""
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Order Response:", string(body))
+
+	// Parse JSON response
 	var orderResponse struct {
 		OrderID int `json:"orderId"`
 	}
 	if err := json.Unmarshal(body, &orderResponse); err != nil {
-		log.Fatal("Error parsing response:", err)
+		log.Fatal(err)
 	}
 
+	// Return the order ID as a string
 	return strconv.Itoa(orderResponse.OrderID)
 }
