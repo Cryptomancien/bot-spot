@@ -12,42 +12,38 @@ import (
 
 type ExchangeClient interface {
 	CheckConnection()
-	GetBalanceUSDT() float32
-	GetLastPriceBTC() float32
+	GetBalanceUSDT() float64
+	GetLastPriceBTC() float64
 	SetBaseURL(url string)
+	//CreateOrder(side string, price, quantity float64) string
 }
 
-func CalcAmountUSDT(freeBalance float32, percentStr string) float32 {
-	percent64, err := strconv.ParseFloat(percentStr, 64)
+func CalcAmountUSDT(freeBalance float64, percentStr string) float64 {
+	percent, err := strconv.ParseFloat(percentStr, 64)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	percent := float32(percent64)
-
 	return percent * freeBalance / 100
 }
 
-func CalcAmountBTC(availableUSDT float32, priceBTC float32) float32 {
+func CalcAmountBTC(availableUSDT, priceBTC float64) float64 {
 	return availableUSDT / priceBTC
 }
 
-func FormatSmallFloat(quantity float32) string {
+func FormatSmallFloat(quantity float64) string {
 	return fmt.Sprintf("%.6f", quantity)
 }
 
 var client ExchangeClient
 
 func New() {
-	var exchange = os.Getenv("EXCHANGE")
-	var percent = os.Getenv("PERCENT")
+	exchange := os.Getenv("EXCHANGE")
+	percent := os.Getenv("PERCENT")
 
-	var buyOffset, _ = strconv.ParseFloat(os.Getenv("BUY_OFFSET"), 32)
-
+	buyOffset, _ := strconv.ParseFloat(os.Getenv("BUY_OFFSET"), 64)
 	buyOffset = math.Abs(buyOffset)
 
-	var sellOffset, _ = strconv.ParseFloat(os.Getenv("SELL_OFFSET"), 32)
-
+	sellOffset, _ := strconv.ParseFloat(os.Getenv("SELL_OFFSET"), 64)
 	sellOffset = math.Abs(sellOffset)
 
 	switch exchange {
@@ -55,7 +51,7 @@ func New() {
 		client = mexc.NewClient()
 		client.SetBaseURL("https://api.mexc.co")
 	default:
-		fmt.Println("Unsupported exchange:", os.Getenv("EXCHANGE"))
+		fmt.Println("Unsupported exchange:", exchange)
 		os.Exit(0)
 	}
 
@@ -73,12 +69,14 @@ func New() {
 	fmt.Println("")
 
 	newCycleUSDT := CalcAmountUSDT(freeBalance, percent)
-	fmt.Println("USDT for this new cycle: ", newCycleUSDT)
+	fmt.Println("USDT for this new cycle:", newCycleUSDT)
 
 	newCycleBTC := CalcAmountBTC(newCycleUSDT, btcPrice)
-	fmt.Println("BTC for this new cycle: ", newCycleBTC)
+	fmt.Println("BTC for this new cycle:", newCycleBTC)
 
 	newCycleBTCFormated := FormatSmallFloat(newCycleBTC)
-	fmt.Println("BTCFormated for this new cycle: ", newCycleBTCFormated)
+	fmt.Println("BTCFormated for this new cycle:", newCycleBTCFormated)
 
+	buyPrice := btcPrice - buyOffset
+	fmt.Println("buy price:", buyPrice)
 }

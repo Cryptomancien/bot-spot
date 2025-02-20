@@ -35,86 +35,55 @@ func (c *Client) SetBaseURL(url string) {
 }
 
 func (c *Client) CheckConnection() {
-	color.Blue("Checking connection...")
-
-	endpoint := "/api/v3/ping"
-	fullURL := fmt.Sprintf("%s%s", c.BaseURL, endpoint)
-
-	req, err := http.NewRequest("GET", fullURL, nil)
+	resp, err := http.Get(c.BaseURL + "/api/v3/ping")
 	if err != nil {
-		fmt.Println("Error creating request:", err)
-		os.Exit(0)
+		log.Fatalf("Failed to connect to MEXC: %v", err)
 	}
-
-	// Perform the request
-	client := http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println("Error making request:", err)
-		os.Exit(0)
-	}
-
 	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println("Error closing body:", err)
+		if err := Body.Close(); err != nil {
+			log.Fatal(err)
 		}
 	}(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
-		os.Exit(0)
+		log.Fatalf("MEXC API returned non-200 status: %d", resp.StatusCode)
 	}
 
-	color.Green("Connection OK")
-	fmt.Println("")
+	fmt.Println("Connected to MEXC API successfully")
 }
 
-func (c *Client) GetBalanceUSDT() float32 {
+func (c *Client) GetBalanceUSDT() float64 {
 	color.Blue("Checking USDT balance...")
 	endpoint := "/api/v3/account"
 	timestamp := time.Now().UnixMilli()
 
-	// Construct the query string
 	queryString := fmt.Sprintf("timestamp=%d", timestamp)
-
-	// Generate HMAC-SHA256 signature
 	h := hmac.New(sha256.New, []byte(c.APISecret))
 	h.Write([]byte(queryString))
 	signature := hex.EncodeToString(h.Sum(nil))
 
-	// Build the full request URL
 	fullURL := fmt.Sprintf("%s%s?%s&signature=%s", c.BaseURL, endpoint, queryString, signature)
 
-	// Create the HTTP request
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
-		fmt.Println("Error creating request:", err)
+		log.Println("Error creating request:", err)
 	}
 
-	// Set request headers
 	req.Header.Set("X-MEXC-APIKEY", c.APIKey)
 
-	// Execute the request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Error making request:", err)
 		os.Exit(0)
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Println("Error closing body:", err)
-		}
-	}(resp.Body)
+	defer resp.Body.Close()
 
-	// Read response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("Error reading response:", err)
 		os.Exit(0)
 	}
-	// {"makerCommission":null,"takerCommission":null,"buyerCommission":null,"sellerCommission":null,"canTrade":true,"canWithdraw":true,"canDeposit":true,"updateTime":null,"accountType":"SPOT","balances":[{"asset":"USDT","free":"25789.44","locked":"0"},{"asset":"SOL","free":"0.009678398","locked":"0"}],"permissions":["SPOT"]}
 
 	balances, _, _, err := jsonparser.Get(body, "balances")
 	if err != nil {
@@ -122,44 +91,40 @@ func (c *Client) GetBalanceUSDT() float32 {
 		os.Exit(0)
 	}
 
-	var freeFloat float32
+	var freeFloat float64
 	_, err = jsonparser.ArrayEach(balances, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		asset, _ := jsonparser.GetString(value, "asset")
 		if asset == "USDT" {
 			freeStr, _ := jsonparser.GetString(value, "free")
-			free, _ := strconv.ParseFloat(freeStr, 32)
+			free, _ := strconv.ParseFloat(freeStr, 64)
 			if err != nil {
-				fmt.Println("Error converting free balance:", err)
+				log.Println("Error converting free balance:", err)
 				os.Exit(0)
 			}
 
-			freeFloat = float32(free)
+			freeFloat = free
 		}
 	})
 
 	return freeFloat
 }
 
-func (c *Client) GetLastPriceBTC() float32 {
+func (c *Client) GetLastPriceBTC() float64 {
 	fmt.Println("Getting last price...")
 
 	endpoint := "/api/v3/ticker/price"
 	symbol := "BTCUSDT"
 
-	// Build full URL
 	fullURL := fmt.Sprintf("%s%s?symbol=%s", c.BaseURL, endpoint, symbol)
 
-	// Create HTTP request
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		log.Fatal(err)
 		return 0
 	}
 
-	// Set headers if required
 	req.Header.Set("X-MEXC-APIKEY", c.APIKey)
 
-	// Execute request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -168,7 +133,7 @@ func (c *Client) GetLastPriceBTC() float32 {
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			fmt.Println("Error closing body:", err)
+			log.Fatal(err)
 		}
 	}(resp.Body)
 
@@ -183,42 +148,36 @@ func (c *Client) GetLastPriceBTC() float32 {
 		return 0
 	}
 
-	price, err := strconv.ParseFloat(priceStr, 32)
+	price, err := strconv.ParseFloat(priceStr, 64)
 	if err != nil {
 		log.Fatal("Error converting price:", err)
 		return 0
 	}
 
-	return float32(price)
+	return price
 }
 
-func (c *Client) CreateOrder(side string, price, quantity float32) string {
+func (c *Client) CreateOrder(side string, price, quantity float64) string {
 	endpoint := "/api/v3/order"
 	timestamp := time.Now().UnixMilli()
 
-	// Create query string
 	queryString := fmt.Sprintf("symbol=BTCUSDT&side=%s&type=LIMIT&timeInForce=GTC&quantity=%f&price=%f&timestamp=%d",
 		side, quantity, price, timestamp)
 
-	// Create HMAC-SHA256 signature
 	h := hmac.New(sha256.New, []byte(c.APISecret))
 	h.Write([]byte(queryString))
 	signature := hex.EncodeToString(h.Sum(nil))
 
-	// Build full URL
 	fullURL := fmt.Sprintf("%s%s?%s&signature=%s", c.BaseURL, endpoint, queryString, signature)
 
-	// Create HTTP request
 	req, err := http.NewRequest("POST", fullURL, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Set headers
 	req.Header.Set("X-MEXC-APIKEY", c.APIKey)
 	req.Header.Set("Content-Type", "application/json")
 
-	// Execute request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -227,11 +186,10 @@ func (c *Client) CreateOrder(side string, price, quantity float32) string {
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			log.Fatal("Error closing body:", err)
+			log.Fatal(err)
 		}
 	}(resp.Body)
 
-	// Check if HTTP status code is OK (200-299)
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		fmt.Println("Error: Received non-OK HTTP status code:", resp.StatusCode)
 		return ""
@@ -244,7 +202,6 @@ func (c *Client) CreateOrder(side string, price, quantity float32) string {
 
 	fmt.Println("Order Response:", string(body))
 
-	// Parse JSON response
 	var orderResponse struct {
 		OrderID int `json:"orderId"`
 	}
@@ -252,6 +209,5 @@ func (c *Client) CreateOrder(side string, price, quantity float32) string {
 		log.Fatal(err)
 	}
 
-	// Return the order ID as a string
 	return strconv.Itoa(orderResponse.OrderID)
 }
