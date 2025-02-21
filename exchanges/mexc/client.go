@@ -4,7 +4,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"github.com/buger/jsonparser"
 	"io"
@@ -56,7 +55,6 @@ func (c *Client) sendRequest(method, endpoint, queryString string) ([]byte, erro
 	if err != nil {
 		return nil, err
 	}
-
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
@@ -64,11 +62,17 @@ func (c *Client) sendRequest(method, endpoint, queryString string) ([]byte, erro
 		}
 	}(resp.Body)
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, fmt.Errorf("error: received non-OK HTTP status code: %d", resp.StatusCode)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
 
-	return io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("Raw API Response:", string(body))
+		return nil, fmt.Errorf("error: HTTP status %d - %s", resp.StatusCode, string(body))
+	}
+
+	return body, nil
 }
 
 func (c *Client) CheckConnection() {
@@ -80,8 +84,8 @@ func (c *Client) CheckConnection() {
 	fmt.Println("Connected to MEXC API successfully")
 }
 
-func (c *Client) GetBalanceUSDT() float64 {
-	fmt.Println("Checking USDT balance...")
+func (c *Client) GetBalanceUSD() float64 {
+	fmt.Println("Checking USDC balance...")
 
 	timestamp := time.Now().UnixMilli()
 	queryString := fmt.Sprintf("timestamp=%d", timestamp)
@@ -101,7 +105,7 @@ func (c *Client) GetBalanceUSDT() float64 {
 	var freeFloat float64
 	_, err = jsonparser.ArrayEach(balances, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		asset, _ := jsonparser.GetString(value, "asset")
-		if asset == "USDT" {
+		if asset == "USDC" {
 			freeStr, _ := jsonparser.GetString(value, "free")
 			free, _ := strconv.ParseFloat(freeStr, 64)
 			freeFloat = free
@@ -114,7 +118,7 @@ func (c *Client) GetBalanceUSDT() float64 {
 func (c *Client) GetLastPriceBTC() float64 {
 	fmt.Println("Fetching last BTC price...")
 
-	queryString := "symbol=BTCUSDT"
+	queryString := "symbol=BTCUSDC"
 	body, err := c.sendRequest("GET", "/api/v3/ticker/price", queryString)
 	if err != nil {
 		log.Fatalf("Error fetching BTC price: %v", err)
@@ -132,42 +136,26 @@ func (c *Client) GetLastPriceBTC() float64 {
 
 	return price
 }
-func (c *Client) CreateOrder(side, price, quantity string) (string, error) {
+
+func (c *Client) CreateOrder(side, price, quantity string) ([]byte, error) {
 	timestamp := strconv.FormatInt(time.Now().UnixMilli(), 10)
 
 	queryString := fmt.Sprintf(
-		"symbol=BTCUSDT&side=%s&type=LIMIT&timeInForce=GTC&quantity=%s&price=%s&timestamp=%s",
+		"symbol=BTCUSDC&side=%s&type=LIMIT&quantity=%s&price=%s&timestamp=%s",
 		side, quantity, price, timestamp,
 	)
 
 	signature := c.signRequest(queryString)
 	signedQuery := fmt.Sprintf("%s&signature=%s", queryString, signature)
 
+	// Send request
 	body, err := c.sendRequest("POST", "/api/v3/order", signedQuery)
 	if err != nil {
-		return "", fmt.Errorf("error sending request: %v", err)
+		return nil, fmt.Errorf("error sending request: %v", err)
 	}
 
-	// Check for API errors
-	var apiError struct {
-		Code int    `json:"code"`
-		Msg  string `json:"msg"`
-	}
-	if err := json.Unmarshal(body, &apiError); err == nil && apiError.Code != 0 {
-		return "", fmt.Errorf("API error [%d]: %s", apiError.Code, apiError.Msg)
-	}
+	// Print raw API response
+	fmt.Println("Raw API Response:", string(body))
 
-	// Parse successful response
-	var orderResponse struct {
-		OrderID int `json:"orderId"`
-	}
-	if err := json.Unmarshal(body, &orderResponse); err != nil {
-		return "", fmt.Errorf("error parsing order response: %v", err)
-	}
-
-	if orderResponse.OrderID == 0 {
-		return "", fmt.Errorf("unexpected API response: %s", string(body))
-	}
-
-	return strconv.Itoa(orderResponse.OrderID), nil
+	return body, nil
 }

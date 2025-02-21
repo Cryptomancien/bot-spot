@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"github.com/buger/jsonparser"
 	"github.com/fatih/color"
 	"log"
 	"main/exchanges/mexc"
@@ -12,13 +13,13 @@ import (
 
 type ExchangeClient interface {
 	CheckConnection()
-	GetBalanceUSDT() float64
+	GetBalanceUSD() float64
 	GetLastPriceBTC() float64
 	SetBaseURL(url string)
-	CreateOrder(side string, price string, quantity string) (string, error)
+	CreateOrder(side, price, quantity string) ([]byte, error)
 }
 
-func CalcAmountUSDT(freeBalance float64, percentStr string) float64 {
+func CalcAmountUSD(freeBalance float64, percentStr string) float64 {
 	percent, err := strconv.ParseFloat(percentStr, 64)
 	if err != nil {
 		log.Fatal(err)
@@ -26,8 +27,8 @@ func CalcAmountUSDT(freeBalance float64, percentStr string) float64 {
 	return percent * freeBalance / 100
 }
 
-func CalcAmountBTC(availableUSDT, priceBTC float64) float64 {
-	return availableUSDT / priceBTC
+func CalcAmountBTC(availableUSD, priceBTC float64) float64 {
+	return availableUSD / priceBTC
 }
 
 func FormatSmallFloat(quantity float64) string {
@@ -57,8 +58,8 @@ func New() {
 
 	client.CheckConnection()
 
-	freeBalance := client.GetBalanceUSDT()
-	fmt.Println("Free USDT Balance:", freeBalance)
+	freeBalance := client.GetBalanceUSD()
+	fmt.Println("Free USDC Balance:", freeBalance)
 	if freeBalance < 10 {
 		color.Red("At least 10$ needed")
 		os.Exit(0)
@@ -68,10 +69,10 @@ func New() {
 	fmt.Println("BTC Price:", btcPrice)
 	fmt.Println("")
 
-	newCycleUSDT := CalcAmountUSDT(freeBalance, percent)
-	fmt.Println("USDT for this new cycle:", newCycleUSDT)
+	newCycleUSDC := CalcAmountUSD(freeBalance, percent)
+	fmt.Println("USDC for this new cycle:", newCycleUSDC)
 
-	newCycleBTC := CalcAmountBTC(newCycleUSDT, btcPrice)
+	newCycleBTC := CalcAmountBTC(newCycleUSDC, btcPrice)
 	fmt.Println("BTC for this new cycle:", newCycleBTC)
 
 	newCycleBTCFormated := FormatSmallFloat(newCycleBTC)
@@ -86,11 +87,17 @@ func New() {
 	// Prepare Order
 	buyPriceStr := fmt.Sprintf("%.2f", buyPrice)
 
-	orderID, err := client.CreateOrder("BUY", buyPriceStr, newCycleBTCFormated)
+	body, err := client.CreateOrder("BUY", buyPriceStr, newCycleBTCFormated)
 	if err != nil {
-		fmt.Println("Order failed:", err)
-	} else {
-		fmt.Println("Order placed successfully, ID:", orderID)
+		color.Red("Order failed:", err)
+		os.Exit(0)
 	}
+
+	orderId, _, _, err := jsonparser.Get(body, "orderId")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("OrderId:", string(orderId))
 
 }

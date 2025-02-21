@@ -5,14 +5,14 @@ import (
 	"testing"
 )
 
-func TestCalcAmountUSDT(t *testing.T) {
+func TestCalcAmountUSD(t *testing.T) {
 
-	amountUSDT := CalcAmountUSDT(200.32, "6")
-	fmt.Println(amountUSDT)
+	amountUSD := CalcAmountUSD(200.32, "6")
+	fmt.Println(amountUSD)
 
 	priceBTC := 98000.00
-	availableUSDT := 10.00
+	availableUSD := 10.00
 
-	amountCycleBTC := CalcAmountBTC(availableUSDT, priceBTC)
+	amountCycleBTC := CalcAmountBTC(availableUSD, priceBTC)
 	fmt.Println(amountCycleBTC)
 }
