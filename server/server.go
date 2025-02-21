@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"github.com/ostafen/clover"
 	"html/template"
 	"log"
 	"main/database"
@@ -10,36 +9,53 @@ import (
 )
 
 func Serve() {
-	databasePath := database.GetDatabasePath()
-	db, err := clover.Open(databasePath)
-	if err != nil {
-		log.Fatal("Error opening database:", err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Println("Error closing database:", err)
-		}
-	}()
 
 	fmt.Println("http://localhost:8080")
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		docs, err := db.Query("cycles").FindAll()
-		if err != nil {
-			http.Error(w, "Error fetching data", http.StatusInternalServerError)
-			return
-		}
+		docs := database.List()
 
 		var cycles []map[string]interface{}
 		for _, doc := range docs {
+			quantity := doc.Get("quantity")
+			buyPrice := doc.Get("buyPrice")
+			sellPrice := doc.Get("sellPrice")
+
+			var quantityFloat, buyPriceFloat, sellPriceFloat float64
+			var quantityStr string
+
+			if q, ok := quantity.(float64); ok {
+				quantityFloat = q
+				quantityStr = fmt.Sprintf("%.8f", q)
+			} else {
+				quantityStr = fmt.Sprintf("%v", quantity)
+			}
+
+			if bp, ok := buyPrice.(float64); ok {
+				buyPriceFloat = bp
+			}
+
+			if sp, ok := sellPrice.(float64); ok {
+				sellPriceFloat = sp
+			}
+
+			var percentageChange string
+			if buyPriceFloat > 0 {
+				change := ((quantityFloat * sellPriceFloat) - (quantityFloat * buyPriceFloat)) / (quantityFloat * buyPriceFloat) * 100
+				percentageChange = fmt.Sprintf("%.2f%%", change)
+			} else {
+				percentageChange = "N/A"
+			}
+
 			cycles = append(cycles, map[string]interface{}{
 				"_id":       doc.Get("_id"),
-				"buyPrice":  doc.Get("buyPrice"),
-				"sellPrice": doc.Get("sellPrice"),
 				"exchange":  doc.Get("exchange"),
-				"quantity":  doc.Get("quantity"),
 				"status":    doc.Get("status"),
+				"quantity":  quantityStr,
+				"buyPrice":  buyPriceFloat,
+				"sellPrice": sellPriceFloat,
+				"change":    percentageChange,
 			})
 		}
 
@@ -55,7 +71,7 @@ func Serve() {
 		}
 	})
 
-	err = http.ListenAndServe("localhost:8080", mux)
+	err := http.ListenAndServe("localhost:8080", mux)
 	if err != nil {
 		log.Fatal(err)
 	}

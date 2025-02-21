@@ -11,12 +11,12 @@
                 color: #fff;
             }
 
-            .order_buy_placed {
+            .buy {
                 background: #4a0a41;
                 color: #fff;
             }
 
-            .order_sell_placed {
+            .sell {
                 background: #785a0c;
                 color: #fff;
             }
@@ -97,7 +97,7 @@
                                         <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .quantity }}</td>
                                         <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .buyPrice }}</td>
                                         <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .sellPrice }}</td>
-                                        <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ "4%" }}</td>
+                                        <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .change }}</td>
                                     </tr>
                                 {{ end }}
                             </tbody>

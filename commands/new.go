@@ -5,6 +5,7 @@ import (
 	"github.com/buger/jsonparser"
 	"github.com/fatih/color"
 	"log"
+	"main/database"
 	"main/exchanges/mexc"
 	"math"
 	"os"
@@ -100,4 +101,17 @@ func New() {
 
 	fmt.Println("OrderId:", string(orderId))
 
+	// Insert in database
+	cycle := database.Cycle{
+		Exchange:  "mexc",
+		Status:    "buy",
+		Quantity:  newCycleBTC,
+		BuyPrice:  buyPrice,
+		BuyId:     string(orderId),
+		SellPrice: sellPrice,
+		SellId:    "",
+	}
+	database.NewCycle(&cycle)
+
+	color.Green("New Cycle successfully inserted in database:")
 }
