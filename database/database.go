@@ -57,10 +57,10 @@ func GetDB() *clover.DB {
 type Cycle struct {
 	Exchange  string
 	Status    string
-	Quantity  float32
-	BuyPrice  float32
+	Quantity  float64
+	BuyPrice  float64
 	BuyId     string
-	SellPrice float32
+	SellPrice float64
 	SellId    string
 }
 
