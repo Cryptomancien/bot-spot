@@ -25,7 +25,7 @@ func NewClient() *Client {
 	return &Client{
 		APIKey:    os.Getenv("MEXC_API_KEY"),
 		APISecret: os.Getenv("MEXC_SECRET_KEY"),
-		BaseURL:   "https://api.mexc.co",
+		BaseURL:   "https://api.mexc.com",
 	}
 }
 
@@ -56,6 +56,7 @@ func (c *Client) sendRequest(method, endpoint, queryString string) ([]byte, erro
 	if err != nil {
 		return nil, err
 	}
+
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
@@ -131,12 +132,11 @@ func (c *Client) GetLastPriceBTC() float64 {
 
 	return price
 }
-
-func (c *Client) CreateOrder(side string, price, quantity float64) string {
-	timestamp := time.Now().UnixMilli()
+func (c *Client) CreateOrder(side, price, quantity string) (string, error) {
+	timestamp := strconv.FormatInt(time.Now().UnixMilli(), 10)
 
 	queryString := fmt.Sprintf(
-		"symbol=BTCUSDT&side=%s&type=LIMIT&timeInForce=GTC&quantity=%.6f&price=%.2f&timestamp=%d",
+		"symbol=BTCUSDT&side=%s&type=LIMIT&timeInForce=GTC&quantity=%s&price=%s&timestamp=%s",
 		side, quantity, price, timestamp,
 	)
 
@@ -145,15 +145,29 @@ func (c *Client) CreateOrder(side string, price, quantity float64) string {
 
 	body, err := c.sendRequest("POST", "/api/v3/order", signedQuery)
 	if err != nil {
-		log.Fatalf("Error placing order: %v", err)
+		return "", fmt.Errorf("error sending request: %v", err)
 	}
 
+	// Check for API errors
+	var apiError struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+	}
+	if err := json.Unmarshal(body, &apiError); err == nil && apiError.Code != 0 {
+		return "", fmt.Errorf("API error [%d]: %s", apiError.Code, apiError.Msg)
+	}
+
+	// Parse successful response
 	var orderResponse struct {
 		OrderID int `json:"orderId"`
 	}
 	if err := json.Unmarshal(body, &orderResponse); err != nil {
-		log.Fatalf("Error parsing order response: %v", err)
+		return "", fmt.Errorf("error parsing order response: %v", err)
 	}
 
-	return strconv.Itoa(orderResponse.OrderID)
+	if orderResponse.OrderID == 0 {
+		return "", fmt.Errorf("unexpected API response: %s", string(body))
+	}
+
+	return strconv.Itoa(orderResponse.OrderID), nil
 }

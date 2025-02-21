@@ -15,7 +15,7 @@ type ExchangeClient interface {
 	GetBalanceUSDT() float64
 	GetLastPriceBTC() float64
 	SetBaseURL(url string)
-	//CreateOrder(side string, price, quantity float64) string
+	CreateOrder(side string, price string, quantity string) (string, error)
 }
 
 func CalcAmountUSDT(freeBalance float64, percentStr string) float64 {
@@ -79,4 +79,18 @@ func New() {
 
 	buyPrice := btcPrice - buyOffset
 	fmt.Println("buy price:", buyPrice)
+
+	sellPrice := btcPrice + sellOffset
+	fmt.Println("sell price:", sellPrice)
+
+	// Prepare Order
+	buyPriceStr := fmt.Sprintf("%.2f", buyPrice)
+
+	orderID, err := client.CreateOrder("BUY", buyPriceStr, newCycleBTCFormated)
+	if err != nil {
+		fmt.Println("Order failed:", err)
+	} else {
+		fmt.Println("Order placed successfully, ID:", orderID)
+	}
+
 }
