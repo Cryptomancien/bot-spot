@@ -56,6 +56,8 @@ func Serve() {
 				"buyPrice":  buyPriceFloat,
 				"sellPrice": sellPriceFloat,
 				"change":    percentageChange,
+				"buyId":     doc.Get("buyId"),
+				"sellId":    doc.Get("sellId"),
 			})
 		}
 
