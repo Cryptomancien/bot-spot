@@ -54,9 +54,12 @@ func GetDB() *clover.DB {
 	return db
 }
 
+type Status string
+
 type Cycle struct {
+	IdInt     int32
 	Exchange  string
-	Status    string
+	Status    string // buy sell completed
 	Quantity  float64
 	BuyPrice  float64
 	BuyId     string
@@ -73,7 +76,7 @@ func List() []*clover.Document {
 		}
 	}(db)
 
-	docs, err := db.Query(CollectionName).FindAll()
+	docs, err := db.Query(CollectionName).Sort(clover.SortOption{"idInt", -1}).FindAll()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,7 +84,39 @@ func List() []*clover.Document {
 	return docs
 }
 
+func PrepareIdInt() int32 {
+	db := GetDB()
+
+	defer func(db *clover.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(db)
+
+	count, err := db.Query(CollectionName).Count()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if count == 0 {
+		return 1
+	}
+
+	lastDoc, _ := db.Query(CollectionName).Sort(clover.SortOption{
+		Field:     "idInt",
+		Direction: -1,
+	}).Limit(1).FindFirst()
+
+	fmt.Println("lastDoc:", lastDoc)
+
+	lastId := (lastDoc.Get("idInt")).(int64)
+	nextId := lastId + 1
+
+	return int32(nextId)
+}
+
 func NewCycle(cycle *Cycle) {
+	idInt := PrepareIdInt()
 	exchange := cycle.Exchange
 	status := cycle.Status
 	quantity := cycle.Quantity
@@ -91,6 +126,7 @@ func NewCycle(cycle *Cycle) {
 	sellId := cycle.SellId
 
 	doc := clover.NewDocument()
+	doc.Set("idInt", idInt)
 	doc.Set("exchange", exchange)
 	doc.Set("status", status)
 	doc.Set("quantity", quantity)
@@ -102,7 +138,7 @@ func NewCycle(cycle *Cycle) {
 	db := GetDB()
 	docId, err := db.InsertOne(CollectionName, doc)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 
 	fmt.Println("docId:", docId)
@@ -117,18 +153,24 @@ func NewCycle(cycle *Cycle) {
 
 func GetById(id string) *clover.Document {
 	db := GetDB()
-
 	document, err := db.Query(CollectionName).FindById(id)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	return document
 }
 
 func DeleteById(id string) {
 	db := GetDB()
 	err := db.Query(CollectionName).DeleteById(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func FindCycleByIdAndUpdate(id, field string, value string) {
+	db := GetDB()
+	err := db.Query(CollectionName).UpdateById(id, map[string]interface{}{field: value})
 	if err != nil {
 		log.Fatal(err)
 	}

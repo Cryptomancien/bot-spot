@@ -33,6 +33,11 @@ func TestGetById(t *testing.T) {
 }
 
 func TestDeleteById(t *testing.T) {
-	id := "6a3743ae-bee8-46da-9905-81b8ae261a72"
+	id := "ef26b72f-e034-45db-95e2-543ad40f229f"
 	DeleteById(id)
+}
+
+func TestPrepareIdInt(t *testing.T) {
+	id := PrepareIdInt()
+	fmt.Println(id)
 }

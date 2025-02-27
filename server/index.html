@@ -63,6 +63,7 @@
                                     Id
                                 </th>
 
+
                                 <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                     Exchange
                                 </th>
@@ -94,12 +95,16 @@
                                 <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                     Sell Id
                                 </th>
+
+                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    UUID
+                                </th>
                             </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
                                 {{ range .Cycles }}
                                     <tr class="{{ .status }}">
-                                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ ._id }}</td>
+                                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .idInt }}</td>
                                         <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .exchange }}</td>
                                         <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .status }}</td>
                                         <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .quantity }}</td>
@@ -108,6 +113,7 @@
                                         <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .change }}</td>
                                         <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .buyId }}</td>
                                         <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .sellId }}</td>
+                                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ ._id }}</td>
                                     </tr>
                                 {{ end }}
                             </tbody>

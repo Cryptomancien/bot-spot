@@ -50,6 +50,7 @@ func Serve() {
 
 			cycles = append(cycles, map[string]interface{}{
 				"_id":       doc.Get("_id"),
+				"idInt":     doc.Get("idInt"),
 				"exchange":  doc.Get("exchange"),
 				"status":    doc.Get("status"),
 				"quantity":  quantityStr,
