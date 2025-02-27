@@ -64,11 +64,11 @@ func (c *Client) sendRequest(method, endpoint, queryString string) ([]byte, erro
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		//fmt.Println("Raw API Response:", string(body))
 		return nil, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Println("Raw API Response:", string(body))
 		return nil, fmt.Errorf("error: HTTP status %d - %s", resp.StatusCode, string(body))
 	}
 
@@ -137,7 +137,7 @@ func (c *Client) GetLastPriceBTC() float64 {
 	return price
 }
 
-func (c *Client) CreateOrder(side, price, quantity string) ([]byte, error) {
+func (c *Client) CreateOrder(side string, price, quantity string) ([]byte, error) {
 	timestamp := strconv.FormatInt(time.Now().UnixMilli(), 10)
 
 	queryString := fmt.Sprintf(
@@ -154,8 +154,32 @@ func (c *Client) CreateOrder(side, price, quantity string) ([]byte, error) {
 		return nil, fmt.Errorf("error sending request: %v", err)
 	}
 
-	// Print raw API response
-	fmt.Println("Raw API Response:", string(body))
+	return body, nil
+}
+
+func (c *Client) GetOrderById(id string) ([]byte, error) {
+	timestamp := strconv.FormatInt(time.Now().UnixMilli(), 10)
+
+	queryString := fmt.Sprintf("symbol=BTCUSDC&orderId=%s&timestamp=%s", id, timestamp)
+	signature := c.signRequest(queryString)
+	signedQuery := fmt.Sprintf("%s&signature=%s", queryString, signature)
+
+	// Send request
+	body, err := c.sendRequest("GET", "/api/v3/order", signedQuery)
+	if err != nil {
+		return nil, fmt.Errorf("error sending request: %v", err)
+	}
+
+	//fmt.Println("Raw API Response:", string(body))
 
 	return body, nil
+}
+
+func (c *Client) IsFilled(order string) bool {
+	status, err := jsonparser.GetString([]byte(order), "status")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return status == "FILLED"
 }
