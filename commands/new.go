@@ -18,6 +18,8 @@ type ExchangeClient interface {
 	GetLastPriceBTC() float64
 	SetBaseURL(url string)
 	CreateOrder(side, price, quantity string) ([]byte, error)
+	GetOrderById(id string) ([]byte, error)
+	IsFilled(id string) bool
 }
 
 func CalcAmountUSD(freeBalance float64, percentStr string) float64 {
