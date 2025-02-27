@@ -10,7 +10,7 @@ import (
 
 func menu() {
 	fmt.Println("")
-	fmt.Println("Cryptomancien - BOT SPOT - v3.0.0")
+	fmt.Println("Cryptomancien - BOT SPOT - v3.0.0 - beta")
 	fmt.Println("")
 	fmt.Println("--new			-n		Start new cycle")
 	fmt.Println("--update		-u		Update running cycles")
@@ -36,8 +36,11 @@ func main() {
 		fmt.Println("")
 		CheckPremium()
 		commands.New()
-	case "-t":
-
+	case "--update", "-u":
+		color.Green("Update running cycles")
+		fmt.Println("")
+		//CheckPremium()
+		commands.Update()
 	case "--server", "-s":
 		server.Serve()
 	default:
