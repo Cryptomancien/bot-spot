@@ -37,6 +37,13 @@ func TestDeleteById(t *testing.T) {
 	DeleteById(id)
 }
 
+func TestDeleteByIdInt(t *testing.T) {
+	for i := range 13 {
+		id := i
+		DeleteByIdInt(int32(id))
+	}
+}
+
 func TestPrepareIdInt(t *testing.T) {
 	id := PrepareIdInt()
 	fmt.Println(id)

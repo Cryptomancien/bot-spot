@@ -76,7 +76,7 @@ func List() []*clover.Document {
 		}
 	}(db)
 
-	docs, err := db.Query(CollectionName).Sort(clover.SortOption{"idInt", -1}).FindAll()
+	docs, err := db.Query(CollectionName).Sort(clover.SortOption{Field: "idInt", Direction: -1}).FindAll()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -153,6 +153,14 @@ func NewCycle(cycle *Cycle) {
 
 func GetById(id string) *clover.Document {
 	db := GetDB()
+
+	defer func(db *clover.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(db)
+
 	document, err := db.Query(CollectionName).FindById(id)
 	if err != nil {
 		log.Fatal(err)
@@ -162,7 +170,35 @@ func GetById(id string) *clover.Document {
 
 func DeleteById(id string) {
 	db := GetDB()
+
+	defer func(db *clover.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(db)
+
 	err := db.Query(CollectionName).DeleteById(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func DeleteByIdInt(idInt int32) {
+	db := GetDB()
+
+	defer func(db *clover.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(db)
+
+	err := db.
+		Query(CollectionName).
+		Where(clover.Field("idInt").
+			Eq(idInt)).
+		Delete()
 	if err != nil {
 		log.Fatal(err)
 	}
