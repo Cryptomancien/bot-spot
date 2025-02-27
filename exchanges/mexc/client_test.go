@@ -2,6 +2,7 @@ package mexc
 
 import (
 	"fmt"
+	"github.com/buger/jsonparser"
 	"github.com/joho/godotenv"
 	"os"
 	"testing"
@@ -26,4 +27,33 @@ func TestCheckConnection(t *testing.T) {
 func TestClient_GetBalanceUSD(t *testing.T) {
 	balance := client.GetBalanceUSD()
 	fmt.Println("balance:", balance)
+}
+
+func TestClient_GetOrderById(t *testing.T) {
+	orderId := os.Getenv("ORDER_ID")
+	order, err := client.GetOrderById(orderId)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	orderJSON, err := jsonparser.ParseString(order)
+
+	fmt.Println(orderJSON)
+
+	isFilled := client.IsFilled(orderJSON)
+	fmt.Println("is filled:", isFilled)
+}
+
+func TestCreateOrder(t *testing.T) {
+	side := "SELL"
+	price := "86600"
+	quantity := "0.000025"
+
+	order, err := client.CreateOrder(side, price, quantity)
+	if err != nil {
+		t.Error(err)
+	}
+
+	fmt.Println(string(order))
 }
