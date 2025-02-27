@@ -21,10 +21,12 @@ func InitDatabase() {
 			log.Fatal(err)
 		}
 	}
-	err := db.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
+	defer func(db *clover.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(db)
 }
 
 func GetDatabasePath() string {
@@ -206,6 +208,14 @@ func DeleteByIdInt(idInt int32) {
 
 func FindCycleByIdAndUpdate(id, field string, value string) {
 	db := GetDB()
+
+	defer func(db *clover.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(db)
+
 	err := db.Query(CollectionName).UpdateById(id, map[string]interface{}{field: value})
 	if err != nil {
 		log.Fatal(err)
