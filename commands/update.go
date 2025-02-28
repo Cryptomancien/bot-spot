@@ -44,11 +44,20 @@ func Update() {
 			order, _ := client.GetOrderById((buyId).(string))
 			isFilled := client.IsFilled(string(order))
 			if !isFilled {
-				color.Blue("%d Order Buy still active - %s", idInt, buyId)
+				fmt.Printf("%s %s %s\n",
+					color.YellowString("%d", idInt),
+					color.CyanString("Order Buy  still active -"),
+					color.WhiteString("%s", buyId),
+				)
 			} else {
-				color.Green("BUY Order Filled:")
+				fmt.Printf("%s %s\n",
+					color.YellowString("%d", idInt),
+					color.GreenString("Order Buy filled"),
+				)
 
 				// Check sell price > last price
+				fmt.Println("SELL PRICE", sellPrice)
+				fmt.Println("id ", idInt)
 				sellPrice := (sellPrice).(float64)
 
 				if lastPrice > sellPrice {
@@ -79,7 +88,11 @@ func Update() {
 					log.Fatal(err)
 				}
 
-				fmt.Println("New sell Order:", string(bytes))
+				fmt.Printf("%s %s %s\n",
+					color.YellowString("%d", idInt),
+					color.CyanString("New sell Order -"),
+					color.WhiteString("%s", string(bytes)),
+				)
 
 				database.FindCycleByIdAndUpdate(idString, "status", "sell")
 				database.FindCycleByIdAndUpdate(idString, "sellId", string(orderId))
@@ -90,15 +103,15 @@ func Update() {
 
 			if !isFilled {
 				fmt.Printf("%s %s %s\n",
-					color.WhiteString("%d", idInt),
+					color.YellowString("%d", idInt),
 					color.CyanString("Order Sell still active -"),
-					color.YellowString("%s", sellId),
+					color.WhiteString("%s", sellId),
 				)
 			} else {
 				database.FindCycleByIdAndUpdate(idString, "status", "completed")
-				fmt.Printf("%s%s\n",
-					color.WhiteString("%d", idInt),
-					color.GreenString(" Cycle successfully completed"),
+				fmt.Printf("%s %s\n",
+					color.YellowString("%d", idInt),
+					color.GreenString("Cycle successfully completed"),
 				)
 			}
 		}
