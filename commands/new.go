@@ -105,7 +105,7 @@ func New() {
 
 	// Insert in database
 	cycle := database.Cycle{
-		Exchange:  "mexc",
+		Exchange:  "mexc", // Todo dynamic
 		Status:    "buy",
 		Quantity:  newCycleBTC,
 		BuyPrice:  buyPrice,
