@@ -40,7 +40,7 @@ func TestDeleteById(t *testing.T) {
 func TestDeleteByIdInt(t *testing.T) {
 	//for i := range 13 {
 	//}
-	id := 21
+	id := 43
 	DeleteByIdInt(int32(id))
 }
 

@@ -30,15 +30,15 @@
                     <dl class="mt-2 grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-2 lg:grid-cols-5">
                         <div class="flex flex-col bg-white/5 p-4">
                             <dt class="text-sm font-semibold leading-6 text-gray-300">Cycles completed</dt>
-                            <dd class="order-first text-xl font-semibold tracking-tight text-white">125/178</dd>
+                            <dd class="order-first text-xl font-semibold tracking-tight text-white">{{ .cyclesCompleted }}/{{ .cyclesCount }}</dd>
                         </div>
                         <div class="flex flex-col bg-white/5 p-4">
                             <dt class="text-sm font-semibold leading-6 text-gray-300">Total Buy</dt>
-                            <dd class="order-first text-xl font-semibold tracking-tight text-white">12 million</dd>
+                            <dd class="order-first text-xl font-semibold tracking-tight text-white">{{ printf "%.2f" .totalBuy }} $</dd>
                         </div>
                         <div class="flex flex-col bg-white/5 p-4">
                             <dt class="text-sm font-semibold leading-6 text-gray-300">Total Sell</dt>
-                            <dd class="order-first text-xl font-semibold tracking-tight text-white">10k</dd>
+                            <dd class="order-first text-xl font-semibold tracking-tight text-white">{{ printf "%.2f" .totalSell }} $</dd>
                         </div>
                         <div class="flex flex-col bg-white/5 p-4">
                             <dt class="text-sm font-semibold leading-6 text-gray-300">Gain %</dt>
