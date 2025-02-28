@@ -16,11 +16,17 @@ func Serve() {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		docs := database.List()
 
+		cyclesCount := 0
+		cyclesCompleted := 0
+		totalBuy := 0.0
+		totalSell := 0.0
+
 		var cycles []map[string]interface{}
 		for _, doc := range docs {
 			quantity := doc.Get("quantity")
 			buyPrice := doc.Get("buyPrice")
 			sellPrice := doc.Get("sellPrice")
+			status := doc.Get("status")
 
 			var quantityFloat, buyPriceFloat, sellPriceFloat float64
 			var quantityStr string
@@ -60,6 +66,19 @@ func Serve() {
 				"buyId":     doc.Get("buyId"),
 				"sellId":    doc.Get("sellId"),
 			})
+
+			// Update stats
+			cyclesCount++
+
+			if status == "completed" {
+				cyclesCompleted++
+
+				b := (buyPrice).(float64) * (quantity).(float64)
+				totalBuy += b
+
+				s := (sellPrice).(float64) * (quantity).(float64)
+				totalSell += s
+			}
 		}
 
 		tmpl, err := template.ParseFiles("server/index.html")
@@ -68,7 +87,13 @@ func Serve() {
 			return
 		}
 
-		err = tmpl.Execute(w, map[string]interface{}{"Cycles": cycles})
+		err = tmpl.Execute(w, map[string]interface{}{
+			"Cycles":          cycles,
+			"cyclesCount":     cyclesCount,
+			"cyclesCompleted": cyclesCompleted,
+			"totalBuy":        totalBuy,
+			"totalSell":       totalSell,
+		})
 		if err != nil {
 			http.Error(w, "Error rendering template", http.StatusInternalServerError)
 		}
