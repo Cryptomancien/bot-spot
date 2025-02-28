@@ -38,10 +38,10 @@ func TestDeleteById(t *testing.T) {
 }
 
 func TestDeleteByIdInt(t *testing.T) {
-	for i := range 13 {
-		id := i
-		DeleteByIdInt(int32(id))
-	}
+	//for i := range 13 {
+	//}
+	id := 21
+	DeleteByIdInt(int32(id))
 }
 
 func TestPrepareIdInt(t *testing.T) {
