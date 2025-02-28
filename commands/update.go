@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"github.com/buger/jsonparser"
 	"github.com/fatih/color"
 	"log"
 	"main/database"
@@ -23,32 +24,32 @@ func Update() {
 	}
 
 	lastPrice := client.GetLastPriceBTC()
-	fmt.Println("Last price:", lastPrice)
+	//fmt.Println("Last price:", lastPrice)
 
 	docs := database.List()
 	for _, doc := range docs {
 
 		id := doc.Get("_id")
+		idInt := doc.Get("idInt")
 		idString := id.(string)
 
 		status := doc.Get("status")
 		quantity := doc.Get("quantity")
-		buyPrice := doc.Get("buyPrice")
+		//buyPrice := doc.Get("buyPrice")
 		buyId := doc.Get("buyId")
 		sellPrice := doc.Get("sellPrice")
 		sellId := doc.Get("sellId")
 
 		if status == "buy" {
-			fmt.Println(id, status, quantity, buyPrice, sellPrice, buyId, sellId)
 			order, _ := client.GetOrderById((buyId).(string))
 			isFilled := client.IsFilled(string(order))
 			if !isFilled {
-				fmt.Println("BUY Order Not filled:")
+				color.Blue("%d Order Buy still active - %s", idInt, buyId)
 			} else {
-				fmt.Println("BUY Order Filled:")
+				color.Green("BUY Order Filled:")
 
 				// Check sell price > last price
-				sellPrice := doc.Get("sellPrice").(float64)
+				sellPrice := (sellPrice).(float64)
 
 				if lastPrice > sellPrice {
 					newSellPrice := sellPrice + 100
@@ -60,38 +61,46 @@ func Update() {
 				}
 
 				// Place sell order
-				quantity := doc.Get("quantity").(float64)
+				quantity := (quantity).(float64)
 				quantityStr := strconv.FormatFloat(quantity, 'f', 6, 64)
-				fmt.Println("New quantity: ", quantityStr)
 
 				doc := database.GetById(idString)
 				sellPrice = doc.Get("sellPrice").(float64)
 				sellPriceStr := strconv.FormatFloat(sellPrice, 'f', 6, 64)
-
-				log.Print("quantityStr: ", quantityStr)
-				return
 
 				bytes, err := client.CreateOrder("SELL", sellPriceStr, quantityStr)
 				if err != nil {
 					log.Fatal(err)
 					return
 				}
+				orderId, _, _, err := jsonparser.Get(bytes, "orderId")
+
+				if err != nil {
+					log.Fatal(err)
+				}
+
 				fmt.Println("New sell Order:", string(bytes))
 
 				database.FindCycleByIdAndUpdate(idString, "status", "sell")
+				database.FindCycleByIdAndUpdate(idString, "sellId", string(orderId))
 			}
 		} else if status == "sell" {
-			order, _ := client.GetOrderById((buyId).(string))
+			order, _ := client.GetOrderById((sellId).(string))
 			isFilled := client.IsFilled(string(order))
 
 			if !isFilled {
-				fmt.Println("Order Not filled")
+				fmt.Printf("%s %s %s\n",
+					color.WhiteString("%d", idInt),
+					color.CyanString("Order Sell still active -"),
+					color.YellowString("%s", sellId),
+				)
 			} else {
 				database.FindCycleByIdAndUpdate(idString, "status", "completed")
-				color.Green("Cycle successfully completed")
+				fmt.Printf("%s%s\n",
+					color.WhiteString("%d", idInt),
+					color.GreenString(" Cycle successfully completed"),
+				)
 			}
-		} else {
-			log.Fatal("Unsupported status:", status)
 		}
 	}
 }
