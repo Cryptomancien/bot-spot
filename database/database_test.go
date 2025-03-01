@@ -2,6 +2,8 @@ package database
 
 import (
 	"fmt"
+	"github.com/ostafen/clover"
+	"log"
 	"testing"
 )
 
@@ -40,11 +42,28 @@ func TestDeleteById(t *testing.T) {
 func TestDeleteByIdInt(t *testing.T) {
 	//for i := range 13 {
 	//}
-	id := 43
+	id := 42
 	DeleteByIdInt(int32(id))
 }
 
 func TestPrepareIdInt(t *testing.T) {
 	id := PrepareIdInt()
 	fmt.Println(id)
+}
+
+func TestFindCycleByIdAndUpdate(t *testing.T) {
+	id := "03132ac5-8c4d-4519-83f5-e76eff383096"
+	db := GetDB()
+
+	defer func(db *clover.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(db)
+
+	err := db.Query(CollectionName).UpdateById(id, map[string]interface{}{"sellPrice": 85149.58})
+	if err != nil {
+		log.Fatal(err)
+	}
 }

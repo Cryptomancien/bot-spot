@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"main/commands"
 	"main/database"
 	"main/server"
@@ -32,13 +31,11 @@ func main() {
 	switch lastArg {
 
 	case "--new", "-n":
-		color.Green("Start new cycle")
-		fmt.Println("")
+		fmt.Println("Start new cycle")
 		CheckPremium()
 		commands.New()
 	case "--update", "-u":
-		color.Green("Update running cycles")
-		fmt.Println("")
+		fmt.Println("Updating running cycle...")
 		//CheckPremium()
 		commands.Update()
 	case "--server", "-s":

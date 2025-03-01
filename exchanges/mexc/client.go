@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/buger/jsonparser"
+	"github.com/fatih/color"
 	"io"
 	"log"
 	"net/http"
@@ -81,11 +82,12 @@ func (c *Client) CheckConnection() {
 		log.Fatalf("Failed to connect to MEXC: %v", err)
 	}
 
-	fmt.Println("Connected to MEXC API successfully")
+	color.Green("Connected to MEXC API successfully")
+	fmt.Println("")
 }
 
 func (c *Client) GetBalanceUSD() float64 {
-	fmt.Println("Checking USDC balance...")
+	color.Blue("Checking USDC balance...")
 
 	timestamp := time.Now().UnixMilli()
 	queryString := fmt.Sprintf("timestamp=%d", timestamp)

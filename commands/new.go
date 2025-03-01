@@ -62,30 +62,44 @@ func New() {
 	client.CheckConnection()
 
 	freeBalance := client.GetBalanceUSD()
-	fmt.Println("Free USDC Balance:", freeBalance)
+	color.White("Free USD Balance: %.2f", freeBalance)
 	if freeBalance < 10 {
 		color.Red("At least 10$ needed")
 		os.Exit(0)
 	}
 
 	btcPrice := client.GetLastPriceBTC()
-	fmt.Println("BTC Price:", btcPrice)
-	fmt.Println("")
+
+	fmt.Printf("%s %s\n",
+		color.CyanString("BTC Price"),
+		color.YellowString("%.2f", btcPrice),
+	)
 
 	newCycleUSDC := CalcAmountUSD(freeBalance, percent)
-	fmt.Println("USDC for this new cycle:", newCycleUSDC)
+
+	fmt.Printf("%s %s\n",
+		color.CyanString("USD for this new cycle:"),
+		color.YellowString("%.2f", newCycleUSDC),
+	)
 
 	newCycleBTC := CalcAmountBTC(newCycleUSDC, btcPrice)
-	fmt.Println("BTC for this new cycle:", newCycleBTC)
-
 	newCycleBTCFormated := FormatSmallFloat(newCycleBTC)
-	fmt.Println("BTCFormated for this new cycle:", newCycleBTCFormated)
+	fmt.Printf("%s %s\n",
+		color.CyanString("BTC for this new cycle:"),
+		color.YellowString(newCycleBTCFormated),
+	)
 
 	buyPrice := btcPrice - buyOffset
-	fmt.Println("buy price:", buyPrice)
+	fmt.Printf("%s %s\n",
+		color.CyanString("Buy Price"),
+		color.YellowString("%.2f", buyPrice),
+	)
 
 	sellPrice := btcPrice + sellOffset
-	fmt.Println("sell price:", sellPrice)
+	fmt.Printf("%s %s\n",
+		color.CyanString("Sell Price"),
+		color.YellowString("%.2f", sellPrice),
+	)
 
 	// Prepare Order
 	buyPriceStr := fmt.Sprintf("%.2f", buyPrice)
