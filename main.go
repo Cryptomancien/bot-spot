@@ -5,6 +5,7 @@ import (
 	"main/commands"
 	"main/database"
 	"main/server"
+	"main/utils"
 )
 
 func menu() {
@@ -19,20 +20,20 @@ func menu() {
 }
 
 func initialize() {
-	CreateConfigFileIfNotExists()
-	LoadDotEnv()
+	utils.CreateConfigFileIfNotExists()
+	utils.LoadDotEnv()
 	database.InitDatabase()
 }
 
 func main() {
 	initialize()
 
-	lastArg := GetLastArg()
+	lastArg := utils.GetLastArg()
 	switch lastArg {
 
 	case "--new", "-n":
 		fmt.Println("Start new cycle")
-		CheckPremium()
+		utils.CheckPremium()
 		commands.New()
 	case "--update", "-u":
 		fmt.Println("Updating running cycle...")

@@ -1,62 +1,50 @@
-name: Build and Release
+name: Build and Release Bot-Spot
 
 on:
   push:
     tags:
-      - "v*" # This workflow runs when a tag like "v1.0.0" is pushed
-
-permissions:
-  contents: write
+      - 'v*'
 
 jobs:
   build:
-    name: Build bot-spot for multiple OS
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [windows, linux, darwin] # darwin is for macOS
+        arch: [amd64]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: stable
+        uses: actions/setup-go@v4
 
-      - name: Create bin directory
-        run: mkdir -p bin
+      - name: Build for ${{ matrix.os }}-${{ matrix.arch }}
+        run: |
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build . -o bin/bot-spot-${{ matrix.os }}-${{ matrix.arch }}
 
-      - name: Build for Windows
-        run: GOOS=windows GOARCH=amd64 go build -o bin/bot-spot-win.exe main.go
-
-      - name: Build for Linux
-        run: GOOS=linux GOARCH=amd64 go build -o bin/bot-spot-linux main.go
-
-      - name: Build for macOS
-        run: GOOS=darwin GOARCH=amd64 go build -o bin/bot-spot-mac main.go
-
-      - name: Upload artifacts
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bot-spot-binaries
-          path: bin/*
+          name: bot-spot-${{ matrix.os }}-${{ matrix.arch }}
+          path: bin/bot-spot-${{ matrix.os }}-${{ matrix.arch }}
 
   release:
-    name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: bot-spot-binaries
-          path: bin
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Create Release
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          files: bin/*
+          files: bot-spot-*/bot-spot-*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
