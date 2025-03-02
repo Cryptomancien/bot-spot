@@ -2,7 +2,6 @@ package database
 
 import (
 	"errors"
-	"fmt"
 	"github.com/ostafen/clover"
 	"log"
 	"os"
@@ -109,8 +108,6 @@ func PrepareIdInt() int32 {
 		Direction: -1,
 	}).Limit(1).FindFirst()
 
-	fmt.Println("lastDoc:", lastDoc)
-
 	lastId := (lastDoc.Get("idInt")).(int64)
 	nextId := lastId + 1
 
@@ -138,12 +135,12 @@ func NewCycle(cycle *Cycle) {
 	doc.Set("sellId", sellId)
 
 	db := GetDB()
-	docId, err := db.InsertOne(CollectionName, doc)
+	_, err := db.InsertOne(CollectionName, doc)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("docId:", docId)
+	//fmt.Println("docId:", docId)
 
 	defer func(db *clover.DB) {
 		err := db.Close()
@@ -206,15 +203,13 @@ func DeleteByIdInt(idInt int32) {
 	}
 }
 
-func FindCycleByIdAndUpdate(id, field string, value string) {
+func FindCycleByIdAndUpdate(id, field string, value interface{}) {
 	db := GetDB()
-
-	defer func(db *clover.DB) {
-		err := db.Close()
-		if err != nil {
+	defer func() {
+		if err := db.Close(); err != nil {
 			log.Fatal(err)
 		}
-	}(db)
+	}()
 
 	err := db.Query(CollectionName).UpdateById(id, map[string]interface{}{field: value})
 	if err != nil {

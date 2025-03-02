@@ -63,9 +63,8 @@ func Update() {
 				if lastPrice > sellPrice {
 					newSellPrice := sellPrice + 100
 					fmt.Println("New sell price: ", newSellPrice)
-					newSellPriceStr := strconv.FormatFloat(newSellPrice, 'f', 2, 64)
 
-					database.FindCycleByIdAndUpdate(idString, "sellPrice", newSellPriceStr)
+					database.FindCycleByIdAndUpdate(idString, "sellPrice", newSellPrice)
 					fmt.Println("New sell price updated: ")
 				}
 

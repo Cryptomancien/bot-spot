@@ -52,7 +52,7 @@ func TestPrepareIdInt(t *testing.T) {
 }
 
 func TestFindCycleByIdAndUpdate(t *testing.T) {
-	id := "03132ac5-8c4d-4519-83f5-e76eff383096"
+	id := "191edf92-0d31-48cc-91d4-af0a15b9428d"
 	db := GetDB()
 
 	defer func(db *clover.DB) {
@@ -62,7 +62,7 @@ func TestFindCycleByIdAndUpdate(t *testing.T) {
 		}
 	}(db)
 
-	err := db.Query(CollectionName).UpdateById(id, map[string]interface{}{"sellPrice": 85149.58})
+	err := db.Query(CollectionName).UpdateById(id, map[string]interface{}{"sellPrice": 86156.31})
 	if err != nil {
 		log.Fatal(err)
 	}
