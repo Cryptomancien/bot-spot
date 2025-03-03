@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"main/commands"
+	"github.com/fatih/color"
+	"main/commands/new"
+	"main/commands/server"
+	"main/commands/update"
 	"main/database"
-	"main/server"
 	"main/utils"
 )
 
@@ -16,6 +18,7 @@ func menu() {
 	fmt.Println("--update		-u		Update running cycles")
 	fmt.Println("--server		-s		Start local server")
 	fmt.Println("--cancel		-cc		Cancel cycle by id")
+	//fmt.Println("--auto			-a		Mode auto")
 	fmt.Println("")
 }
 
@@ -32,13 +35,13 @@ func main() {
 	switch lastArg {
 
 	case "--new", "-n":
-		fmt.Println("Start new cycle")
+		color.Magenta("Start new cycle")
 		utils.CheckPremium()
-		commands.New()
+		new.New()
 	case "--update", "-u":
-		fmt.Println("Updating running cycle...")
+		color.Magenta("Updating running cycle...")
 		//CheckPremium()
-		commands.Update()
+		update.Update()
 	case "--server", "-s":
 		server.Serve()
 	default:

@@ -1,15 +1,18 @@
-package commands
+package update
 
 import (
 	"fmt"
 	"github.com/buger/jsonparser"
 	"github.com/fatih/color"
 	"log"
+	"main/commands"
 	"main/database"
 	"main/exchanges/mexc"
 	"os"
 	"strconv"
 )
+
+var client commands.ExchangeClient
 
 func Update() {
 	exchange := os.Getenv("EXCHANGE")
@@ -61,7 +64,7 @@ func Update() {
 				sellPrice := (sellPrice).(float64)
 
 				if lastPrice > sellPrice {
-					newSellPrice := sellPrice + 100
+					newSellPrice := sellPrice + 200.0
 					fmt.Println("New sell price: ", newSellPrice)
 
 					database.FindCycleByIdAndUpdate(idString, "sellPrice", newSellPrice)

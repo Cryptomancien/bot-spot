@@ -67,3 +67,13 @@ func TestFindCycleByIdAndUpdate(t *testing.T) {
 		log.Fatal(err)
 	}
 }
+
+func TestListPerPage(t *testing.T) {
+	page := 3
+	perPage := 20
+
+	docs := ListPerPage(page, perPage)
+	for _, doc := range docs {
+		fmt.Println(doc)
+	}
+}

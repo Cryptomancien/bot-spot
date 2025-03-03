@@ -6,7 +6,26 @@ import (
 	"log"
 	"main/database"
 	"net/http"
+	"strconv"
 )
+
+var perPage int = 200
+
+func getPage(r *http.Request) int {
+	query := r.URL.Query()
+	pageStr := query.Get("page")
+
+	if pageStr == "" {
+		return 1
+	}
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		return 1
+	}
+
+	return page
+}
 
 func Serve() {
 
@@ -14,8 +33,11 @@ func Serve() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		docs := database.List()
+		page := getPage(r)
+		fmt.Println(page)
 
+		//docs := database.ListPerPage(page, perPage)
+		docs := database.List()
 		cyclesCount := 0
 		cyclesCompleted := 0
 		totalBuy := 0.0
@@ -81,7 +103,11 @@ func Serve() {
 			}
 		}
 
-		tmpl, err := template.ParseFiles("server/index.html")
+		gainAbs := totalSell - totalBuy
+
+		// Pagination
+
+		tmpl, err := template.ParseFiles("commands/server/index.html")
 		if err != nil {
 			http.Error(w, "Error loading template", http.StatusInternalServerError)
 			return
@@ -93,6 +119,8 @@ func Serve() {
 			"cyclesCompleted": cyclesCompleted,
 			"totalBuy":        totalBuy,
 			"totalSell":       totalSell,
+			"gainAbs":         gainAbs,
+			"page":            page,
 		})
 		if err != nil {
 			http.Error(w, "Error rendering template", http.StatusInternalServerError)

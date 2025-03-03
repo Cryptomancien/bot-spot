@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <title>Cycles</title>
+    <style>
+        .completed {
+            background: #095138;
+            color: #fff;
+        }
+
+        .buy {
+            background: #4a0a41;
+            color: #fff;
+        }
+
+        .sell {
+            background: #785a0c;
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="bg-gray-900">
+<section class="bg-gray-900 py-2">
+    <div class="mx-auto max-w-7xl px-6">
+        <div class="mx-auto max-w-2xl lg:max-w-none">
+
+            <dl class="mt-2 grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-2 lg:grid-cols-5">
+                <div class="flex flex-col bg-white/5 p-4">
+                    <dt class="text-sm font-semibold leading-6 text-gray-300">Cycles completed</dt>
+                    <dd class="order-first text-xl font-semibold tracking-tight text-white">{{ .cyclesCompleted }}/{{ .cyclesCount }}</dd>
+                </div>
+                <div class="flex flex-col bg-white/5 p-4">
+                    <dt class="text-sm font-semibold leading-6 text-gray-300">Total Buy</dt>
+                    <dd class="order-first text-xl font-semibold tracking-tight text-white">{{ printf "%.2f" .totalBuy }} $</dd>
+                </div>
+                <div class="flex flex-col bg-white/5 p-4">
+                    <dt class="text-sm font-semibold leading-6 text-gray-300">Total Sell</dt>
+                    <dd class="order-first text-xl font-semibold tracking-tight text-white">{{ printf "%.2f" .totalSell }} $</dd>
+                </div>
+                <div class="flex flex-col bg-white/5 p-4">
+                    <dt class="text-sm font-semibold leading-6 text-gray-300">Gain %</dt>
+                    <dd class="order-first text-xl font-semibold tracking-tight text-white">7.8%</dd>
+                </div>
+                <div class="flex flex-col bg-white/5 p-4">
+                    <dt class="text-sm font-semibold leading-6 text-gray-300">Gain $</dt>
+                    <dd class="order-first text-xl font-semibold tracking-tight text-white">{{ printf "%.2f" .gainAbs }}  $</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</section>
+<section class="container px-4 mx-auto">
+    <div class="-mx-4 -my-2 overflow-x-auto">
+        <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+            <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                        <th scope="col" class="px-12 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            Id
+                        </th>
+
+
+                        <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            Exchange
+                        </th>
+
+                        <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            Status
+                        </th>
+
+                        <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            Quantity
+                        </th>
+
+                        <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            Buy Price
+                        </th>
+
+                        <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            Sell Price
+                        </th>
+
+                        <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            Gain
+                        </th>
+
+                        <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            Buy Id
+                        </th>
+
+                        <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            Sell Id
+                        </th>
+
+                        <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            UUID
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+                    {{ range .Cycles }}
+                    <tr class="{{ .status }}">
+                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .idInt }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .exchange }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .status }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .quantity }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .buyPrice }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .sellPrice }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .change }}</td>
+                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .buyId }}</td>
+                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .sellId }}</td>
+                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ ._id }}</td>
+                    </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

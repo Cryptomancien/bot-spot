@@ -1,26 +1,17 @@
-package commands
+package new
 
 import (
 	"fmt"
 	"github.com/buger/jsonparser"
 	"github.com/fatih/color"
 	"log"
+	"main/commands"
 	"main/database"
 	"main/exchanges/mexc"
 	"math"
 	"os"
 	"strconv"
 )
-
-type ExchangeClient interface {
-	CheckConnection()
-	GetBalanceUSD() float64
-	GetLastPriceBTC() float64
-	SetBaseURL(url string)
-	CreateOrder(side, price, quantity string) ([]byte, error)
-	GetOrderById(id string) ([]byte, error)
-	IsFilled(id string) bool
-}
 
 func CalcAmountUSD(freeBalance float64, percentStr string) float64 {
 	percent, err := strconv.ParseFloat(percentStr, 64)
@@ -38,7 +29,7 @@ func FormatSmallFloat(quantity float64) string {
 	return fmt.Sprintf("%.6f", quantity)
 }
 
-var client ExchangeClient
+var client commands.ExchangeClient
 
 func New() {
 	exchange := os.Getenv("EXCHANGE")
@@ -114,8 +105,6 @@ func New() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println("OrderId:", string(orderId))
 
 	// Insert in database
 	cycle := database.Cycle{

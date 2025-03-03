@@ -203,6 +203,26 @@ func DeleteByIdInt(idInt int32) {
 	}
 }
 
+func ListPerPage(page, perPage int) []*clover.Document {
+	db := GetDB()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	skip := (page - 1) * perPage
+	docs, _ := db.Query(CollectionName).Sort(clover.SortOption{
+		Field:     "idInt",
+		Direction: -1,
+	}).
+		Skip(skip).
+		Limit(perPage).
+		FindAll()
+
+	return docs
+}
+
 func FindCycleByIdAndUpdate(id, field string, value interface{}) {
 	db := GetDB()
 	defer func() {
