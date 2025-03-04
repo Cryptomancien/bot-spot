@@ -1,4 +1,4 @@
-package server
+package commands
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ func getPage(r *http.Request) int {
 	return page
 }
 
-func Serve() {
+func Server() {
 
 	fmt.Println("http://localhost:8080")
 	mux := http.NewServeMux()
@@ -107,7 +107,7 @@ func Serve() {
 
 		// Pagination
 
-		tmpl, err := template.ParseFiles("commands/server/index.html")
+		tmpl, err := template.ParseFiles("commands/_template.html")
 		if err != nil {
 			http.Error(w, "Error loading template", http.StatusInternalServerError)
 			return

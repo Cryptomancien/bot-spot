@@ -1,18 +1,15 @@
-package update
+package commands
 
 import (
 	"fmt"
 	"github.com/buger/jsonparser"
 	"github.com/fatih/color"
 	"log"
-	"main/commands"
 	"main/database"
 	"main/exchanges/mexc"
 	"os"
 	"strconv"
 )
-
-var client commands.ExchangeClient
 
 func Update() {
 	exchange := os.Getenv("EXCHANGE")

@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/fatih/color"
-	"main/commands/cancel"
-	"main/commands/new"
-	"main/commands/server"
-	"main/commands/update"
+	"main/commands"
 	"main/database"
 	"main/utils"
 	"regexp"
@@ -39,15 +36,15 @@ func main() {
 	case "--new", "-n":
 		color.Magenta("Start new cycle")
 		utils.CheckPremium()
-		new.New()
+		commands.New()
 	case "--update", "-u":
 		color.Magenta("Updating running cycle...")
 		//CheckPremium()
-		update.Update()
+		commands.Update()
 	case regexp.MustCompile(`^--cancel=(\d+)$`).FindString(lastArg), regexp.MustCompile(`^-c=(\d+)$`).FindString(lastArg):
-		cancel.Cancel()
+		commands.Cancel()
 	case "--server", "-s":
-		server.Serve()
+		commands.Server()
 	default:
 		menu()
 	}

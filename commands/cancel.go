@@ -1,10 +1,9 @@
-package cancel
+package commands
 
 import (
 	"fmt"
 	"github.com/fatih/color"
 	"log"
-	"main/commands"
 	"main/database"
 	"main/exchanges/mexc"
 	"main/utils"
@@ -12,8 +11,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-var client commands.ExchangeClient
 
 func Cancel() {
 	lastArg := utils.GetLastArg()

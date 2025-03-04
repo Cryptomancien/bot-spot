@@ -1,11 +1,10 @@
-package new
+package commands
 
 import (
 	"fmt"
 	"github.com/buger/jsonparser"
 	"github.com/fatih/color"
 	"log"
-	"main/commands"
 	"main/database"
 	"main/exchanges/mexc"
 	"math"
@@ -29,7 +28,7 @@ func FormatSmallFloat(quantity float64) string {
 	return fmt.Sprintf("%.6f", quantity)
 }
 
-var client commands.ExchangeClient
+var client ExchangeClient
 
 func New() {
 	exchange := os.Getenv("EXCHANGE")
