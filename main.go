@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"main/commands"
 	"main/database"
-	"main/utils"
 	"regexp"
 )
 
@@ -22,24 +20,20 @@ func menu() {
 }
 
 func initialize() {
-	utils.CreateConfigFileIfNotExists()
-	utils.LoadDotEnv()
+	commands.CreateConfigFileIfNotExists()
+	commands.LoadDotEnv()
 	database.InitDatabase()
 }
 
 func main() {
 	initialize()
 
-	lastArg := utils.GetLastArg()
+	lastArg := commands.GetLastArg()
 	switch lastArg {
 
 	case "--new", "-n":
-		color.Magenta("Start new cycle")
-		utils.CheckPremium()
 		commands.New()
 	case "--update", "-u":
-		color.Magenta("Updating running cycle...")
-		//CheckPremium()
 		commands.Update()
 	case regexp.MustCompile(`^--cancel=(\d+)$`).FindString(lastArg), regexp.MustCompile(`^-c=(\d+)$`).FindString(lastArg):
 		commands.Cancel()

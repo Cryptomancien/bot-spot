@@ -5,14 +5,13 @@ import (
 	"github.com/fatih/color"
 	"log"
 	"main/database"
-	"main/utils"
 	"os"
 	"strconv"
 	"strings"
 )
 
 func Cancel() {
-	lastArg := utils.GetLastArg()
+	lastArg := GetLastArg()
 	delimiter := "="
 
 	_, numberString, found := strings.Cut(lastArg, delimiter)
