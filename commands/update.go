@@ -6,22 +6,11 @@ import (
 	"github.com/fatih/color"
 	"log"
 	"main/database"
-	"main/exchanges/mexc"
-	"os"
 	"strconv"
 )
 
 func Update() {
-	exchange := os.Getenv("EXCHANGE")
-
-	switch exchange {
-	case "MEXC":
-		client = mexc.NewClient()
-		client.SetBaseURL("https://api.mexc.co")
-	default:
-		fmt.Println("Unsupported exchange:", exchange)
-		os.Exit(0)
-	}
+	client := GetClientByExchange()
 
 	lastPrice := client.GetLastPriceBTC()
 	//fmt.Println("Last price:", lastPrice)

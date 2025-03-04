@@ -6,7 +6,6 @@ import (
 	"github.com/fatih/color"
 	"log"
 	"main/database"
-	"main/exchanges/mexc"
 	"math"
 	"os"
 	"strconv"
@@ -28,10 +27,8 @@ func FormatSmallFloat(quantity float64) string {
 	return fmt.Sprintf("%.6f", quantity)
 }
 
-var client ExchangeClient
-
 func New() {
-	exchange := os.Getenv("EXCHANGE")
+
 	percent := os.Getenv("PERCENT")
 
 	buyOffset, _ := strconv.ParseFloat(os.Getenv("BUY_OFFSET"), 64)
@@ -40,14 +37,7 @@ func New() {
 	sellOffset, _ := strconv.ParseFloat(os.Getenv("SELL_OFFSET"), 64)
 	sellOffset = math.Abs(sellOffset)
 
-	switch exchange {
-	case "MEXC":
-		client = mexc.NewClient()
-		client.SetBaseURL("https://api.mexc.co")
-	default:
-		fmt.Println("Unsupported exchange:", exchange)
-		os.Exit(0)
-	}
+	client := GetClientByExchange()
 
 	client.CheckConnection()
 

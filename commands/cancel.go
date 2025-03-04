@@ -5,7 +5,6 @@ import (
 	"github.com/fatih/color"
 	"log"
 	"main/database"
-	"main/exchanges/mexc"
 	"main/utils"
 	"os"
 	"strconv"
@@ -49,14 +48,7 @@ func Cancel() {
 		os.Exit(0)
 	}
 
-	switch exchange {
-	case "MEXC":
-		client = mexc.NewClient()
-		client.SetBaseURL("https://api.mexc.co")
-	default:
-		fmt.Println("Unsupported exchange:", exchange)
-		os.Exit(0)
-	}
+	client := GetClientByExchange()
 
 	res, err := client.CancelOrder(orderIdToCancel)
 	if err != nil {

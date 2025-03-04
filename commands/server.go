@@ -107,7 +107,7 @@ func Server() {
 
 		// Pagination
 
-		tmpl, err := template.ParseFiles("commands/_template.html")
+		tmpl, err := template.ParseFiles("commands/misc/template.html")
 		if err != nil {
 			http.Error(w, "Error loading template", http.StatusInternalServerError)
 			return
