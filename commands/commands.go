@@ -30,10 +30,17 @@ const ConfigFilename = "bot.conf"
 
 func CreateConfigFileIfNotExists() {
 	if _, err := os.Stat(ConfigFilename); errors.Is(err, os.ErrNotExist) {
-		content := []byte("CUSTOMER_ID=\n\nEXCHANGE=\n\nMEXC_PUBLIC=\nMEXC_PRIVATE=\n\nBUY_OFFSET=-1000\nSELL_OFFSET=1000\n\nPERCENT=6")
-		err := os.WriteFile(ConfigFilename, content, 0644)
+		pathConfTemplate := fmt.Sprintf("commands/misc/%s", ConfigFilename)
+
+		content, err := os.ReadFile(pathConfTemplate)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
+		}
+
+		//content := []byte("CUSTOMER_ID=\n\nEXCHANGE=\n\nMEXC_PUBLIC=\nMEXC_PRIVATE=\n\nBUY_OFFSET=-1000\nSELL_OFFSET=1000\n\nPERCENT=6")
+		err = os.WriteFile(ConfigFilename, content, 0644)
+		if err != nil {
+			log.Fatal(err)
 		}
 		color.Green("Config file created: " + ConfigFilename)
 	}
