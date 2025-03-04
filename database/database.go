@@ -167,6 +167,24 @@ func GetById(id string) *clover.Document {
 	return document
 }
 
+func GetByIdInt(id int) *clover.Document {
+	db := GetDB()
+
+	defer func(db *clover.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(db)
+
+	document, err := db.Query(CollectionName).Where(clover.Field("idInt").Eq(id)).FindFirst()
+	if err != nil {
+		log.Println(err)
+	}
+
+	return document
+}
+
 func DeleteById(id string) {
 	db := GetDB()
 

@@ -183,3 +183,19 @@ func (c *Client) IsFilled(order string) bool {
 
 	return status == "FILLED"
 }
+
+func (c *Client) CancelOrder(orderID string) ([]byte, error) {
+	timestamp := strconv.FormatInt(time.Now().UnixMilli(), 10)
+
+	queryString := fmt.Sprintf("symbol=BTCUSDC&orderId=%s&timestamp=%s", orderID, timestamp)
+	signature := c.signRequest(queryString)
+	signedQuery := fmt.Sprintf("%s&signature=%s", queryString, signature)
+
+	body, err := c.sendRequest("DELETE", "/api/v3/order", signedQuery)
+	if err != nil {
+		return nil, fmt.Errorf("error canceling order %s: %v", orderID, err)
+	}
+
+	color.Green("Order %s canceled successfully", orderID)
+	return body, nil
+}

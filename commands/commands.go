@@ -8,4 +8,5 @@ type ExchangeClient interface {
 	CreateOrder(side, price, quantity string) ([]byte, error)
 	GetOrderById(id string) ([]byte, error)
 	IsFilled(id string) bool
+	CancelOrder(orderID string) ([]byte, error)
 }
