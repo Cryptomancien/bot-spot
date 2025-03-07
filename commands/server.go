@@ -104,7 +104,7 @@ func Server() {
 		}
 
 		gainAbs := totalSell - totalBuy
-
+		percent := (totalSell - totalBuy) / totalBuy * 100
 		// Pagination
 
 		tmpl, err := template.ParseFiles("commands/misc/template.html")
@@ -121,6 +121,7 @@ func Server() {
 			"totalSell":       totalSell,
 			"gainAbs":         gainAbs,
 			"page":            page,
+			"percent":         percent,
 		})
 		if err != nil {
 			http.Error(w, "Error rendering template", http.StatusInternalServerError)
