@@ -30,7 +30,7 @@ const ConfigFilename = "bot.conf"
 
 func CreateConfigFileIfNotExists() {
 	if _, err := os.Stat(ConfigFilename); errors.Is(err, os.ErrNotExist) {
-		pathConfTemplate := fmt.Sprintf("commands/misc/%s", ConfigFilename)
+		pathConfTemplate := fmt.Sprintf("commands/misc/%s.example", ConfigFilename)
 
 		content, err := os.ReadFile(pathConfTemplate)
 		if err != nil {
