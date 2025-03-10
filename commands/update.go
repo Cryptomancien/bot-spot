@@ -10,6 +10,7 @@ import (
 )
 
 func Update() {
+	CheckPremium()
 	client := GetClientByExchange()
 
 	lastPrice := client.GetLastPriceBTC()
@@ -50,7 +51,8 @@ func Update() {
 				sellPrice := (sellPrice).(float64)
 
 				if lastPrice > sellPrice {
-					newSellPrice := sellPrice + 200.0
+					const offset = 200.0
+					newSellPrice := sellPrice + offset
 					fmt.Println("New sell price: ", newSellPrice)
 
 					database.FindCycleByIdAndUpdate(idString, "sellPrice", newSellPrice)
