@@ -34,10 +34,17 @@ func GetDatabasePath() string {
 		log.Fatal(err)
 	}
 
-	databasePath := filepath.Join(dirname, "cryptomancien/bot-v3")
+	rootDir := filepath.Join(dirname, "cryptomancien")
+	databasePath := filepath.Join(rootDir, "bot-v3")
+
+	if _, err := os.Stat(rootDir); errors.Is(err, os.ErrNotExist) {
+		if err := os.Mkdir(rootDir, os.ModePerm); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	if _, err := os.Stat(databasePath); errors.Is(err, os.ErrNotExist) {
-		err := os.Mkdir(databasePath, os.ModePerm)
-		if err != nil {
+		if err := os.Mkdir(databasePath, os.ModePerm); err != nil {
 			log.Fatal(err)
 		}
 	}
