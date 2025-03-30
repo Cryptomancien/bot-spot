@@ -28,6 +28,7 @@ func getPage(r *http.Request) int {
 }
 
 func Server() {
+	CheckPremium()
 
 	fmt.Println("http://localhost:8080")
 	mux := http.NewServeMux()
