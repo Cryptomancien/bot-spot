@@ -28,22 +28,22 @@ func dotenvToDuration(key string) time.Duration {
 }
 
 func startNewCycle() {
-	duration := dotenvToDuration("AUTO_INTERVAL_MINUTES_NEW")
+	duration := dotenvToDuration("AUTO_INTERVAL_NEW")
 
-	color.Blue("Starting new cycle every %d minutes", int(duration.Minutes()))
+	color.Magenta("Starting new cycle every %s", duration.String())
 
-	for range time.Tick(time.Minute * duration) {
+	for range time.Tick(duration) {
 		fmt.Println(time.Now().Format(time.RubyDate))
 		New()
 	}
 }
 
 func updateRunningCycles() {
-	duration := dotenvToDuration("AUTO_INTERVAL_MINUTES_UPDATE")
+	duration := dotenvToDuration("AUTO_INTERVAL_UPDATE")
 
-	color.Blue("Updating running cycles every %d minutes", int(duration.Minutes()))
+	color.Magenta("Updating running cycles every %s", duration.String())
 
-	for range time.Tick(time.Minute * duration) {
+	for range time.Tick(duration) {
 		fmt.Println(time.Now().Format(time.RubyDate))
 		Update()
 	}
