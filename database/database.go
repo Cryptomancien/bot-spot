@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"fmt"
 	"github.com/ostafen/clover"
 	"log"
 	"os"
@@ -260,4 +261,23 @@ func FindCycleByIdAndUpdate(id, field string, value interface{}) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func CalcGainPercentByIdInt(id int) string {
+	document := GetByIdInt(id)
+
+	if document == nil {
+		log.Fatalf("No document found with id %d", id)
+	}
+
+	buyPrice := document.Get("buyPrice").(float64)
+	sellPrice := document.Get("sellPrice").(float64)
+	quantity := document.Get("quantity").(float64)
+
+	totalBuyUSD := buyPrice * quantity
+	totalSellUSD := sellPrice * quantity
+
+	percent := (totalSellUSD - totalBuyUSD) / (totalBuyUSD) * 100
+
+	return fmt.Sprintf("%.2f", percent)
 }

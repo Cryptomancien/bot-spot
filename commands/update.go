@@ -99,6 +99,10 @@ func Update() {
 				)
 			} else {
 				database.FindCycleByIdAndUpdate(idString, "status", "completed")
+
+				percent := database.CalcGainPercentByIdInt(int(idInt.(int64)))
+				fmt.Println("percent: ", percent)
+
 				fmt.Printf("%s %s\n",
 					color.YellowString("%d", idInt),
 					color.GreenString("Cycle successfully completed"),
