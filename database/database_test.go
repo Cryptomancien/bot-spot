@@ -42,7 +42,7 @@ func TestDeleteById(t *testing.T) {
 func TestDeleteByIdInt(t *testing.T) {
 	//for i := range 13 {
 	//}
-	id := 42
+	id := 407
 	DeleteByIdInt(int32(id))
 }
 
@@ -75,5 +75,14 @@ func TestListPerPage(t *testing.T) {
 	docs := ListPerPage(page, perPage)
 	for _, doc := range docs {
 		fmt.Println(doc)
+	}
+}
+
+func TestDeleteRowsByRange(t *testing.T) {
+	start := 1
+	end := 3
+
+	for i := start; i <= end; i++ {
+		DeleteByIdInt(int32(i))
 	}
 }
