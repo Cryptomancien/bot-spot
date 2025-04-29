@@ -25,7 +25,7 @@ func Update() {
 
 		status := doc.Get("status")
 		quantity := doc.Get("quantity")
-		//buyPrice := doc.Get("buyPrice")
+		buyPrice := doc.Get("buyPrice")
 		buyId := doc.Get("buyId")
 		sellPrice := doc.Get("sellPrice")
 		sellId := doc.Get("sellId")
@@ -100,7 +100,11 @@ func Update() {
 			} else {
 				database.FindCycleByIdAndUpdate(idString, "status", "completed")
 
-				percent := database.CalcGainPercentByIdInt(int(idInt.(int64)))
+				//percent := database.CalcGainPercentByIdInt(int(idInt.(int64)))
+				// Calc Percent
+				totalBuyUSD := buyPrice.(float64) * quantity.(float64)
+				totalSellUSD := sellPrice.(float64) * quantity.(float64)
+				percent := (totalSellUSD - totalBuyUSD) / totalBuyUSD * 100
 
 				fmt.Printf("%s %s (Gain: %.2f%%)\n",
 					color.YellowString("%d", idInt),

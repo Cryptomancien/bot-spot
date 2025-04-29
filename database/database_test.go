@@ -77,9 +77,3 @@ func TestListPerPage(t *testing.T) {
 		fmt.Println(doc)
 	}
 }
-
-func TestCalcGainPercentByIdInt(t *testing.T) {
-	id := 230
-	result := CalcGainPercentByIdInt(id)
-	fmt.Println(result)
-}
