@@ -100,7 +100,6 @@ func Update() {
 			} else {
 				database.FindCycleByIdAndUpdate(idString, "status", "completed")
 
-				//percent := database.CalcGainPercentByIdInt(int(idInt.(int64)))
 				// Calc Percent
 				totalBuyUSD := buyPrice.(float64) * quantity.(float64)
 				totalSellUSD := sellPrice.(float64) * quantity.(float64)
