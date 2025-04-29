@@ -34,7 +34,7 @@ func CreateConfigFileIfNotExists() {
 
 		content, err := os.ReadFile(pathConfTemplate)
 		if err != nil {
-			content = []byte("CUSTOMER_ID=\n\nEXCHANGE=\n\nMEXC_PUBLIC=\nMEXC_PRIVATE=\n\nBUY_OFFSET=-1000\nSELL_OFFSET=1000\n\nPERCENT=6")
+			content = []byte("CUSTOMER_ID=\n\nEXCHANGE=\n\nMEXC_PUBLIC=\nMEXC_PRIVATE=\n\nBUY_OFFSET=-1000\nSELL_OFFSET=1000\n\nPERCENT=6\n\nAUTO_INTERVAL_NEW=60\nAUTO_INTERVAL_UPDATE=10")
 			err := os.WriteFile(ConfigFilename, content, 0644)
 			if err != nil {
 				log.Fatal(err)
