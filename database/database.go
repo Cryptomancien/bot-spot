@@ -86,6 +86,7 @@ func List() []*clover.Document {
 
 	docs, err := db.Query(CollectionName).Sort(clover.SortOption{Field: "idInt", Direction: -1}).FindAll()
 	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatal(err)
 	}
 
@@ -152,6 +153,7 @@ func NewCycle(cycle *Cycle) {
 	defer func(db *clover.DB) {
 		err := db.Close()
 		if err != nil {
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Fatal(err)
 		}
 	}(db)
@@ -169,6 +171,7 @@ func GetById(id string) *clover.Document {
 
 	document, err := db.Query(CollectionName).FindById(id)
 	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatal(err)
 	}
 	return document
@@ -180,6 +183,7 @@ func GetByIdInt(id int) *clover.Document {
 	defer func(db *clover.DB) {
 		err := db.Close()
 		if err != nil {
+			log.SetFlags(log.LstdFlags | log.Lshortfile)
 			log.Fatal(err)
 		}
 	}(db)
@@ -258,6 +262,7 @@ func FindCycleByIdAndUpdate(id, field string, value interface{}) {
 
 	err := db.Query(CollectionName).UpdateById(id, map[string]interface{}{field: value})
 	if err != nil {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Fatal(err)
 	}
 }
