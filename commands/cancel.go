@@ -42,6 +42,13 @@ func Cancel() {
 		orderIdToCancel = (document.Get("buyId")).(string)
 	} else if status == "sell" {
 		orderIdToCancel = (document.Get("sellId")).(string)
+
+		if orderIdToCancel == "" {
+			color.Cyan("No order found for cancelling...deleting")
+			database.DeleteByIdInt(int32(idInt))
+			color.Green("Cycle %d successfully canceled", idInt)
+			os.Exit(0)
+		}
 	} else {
 		color.Red("Unknown status")
 		os.Exit(0)
