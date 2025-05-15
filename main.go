@@ -10,7 +10,7 @@ import (
 
 func menu() {
 	fmt.Println("")
-	fmt.Println("Cryptomancien - BOT SPOT - v3.0.2 - beta")
+	fmt.Println("Cryptomancien - BOT SPOT - v3.0.3 - beta")
 	fmt.Println("")
 	fmt.Println("--new			-n		Start new cycle")
 	fmt.Println("--update		-u		Update running cycles")
