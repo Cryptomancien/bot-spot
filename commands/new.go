@@ -43,7 +43,7 @@ func New() {
 	client.CheckConnection()
 
 	freeBalance := client.GetBalanceUSD()
-	color.White("Free USD Balance: %.2f", freeBalance)
+	color.Cyan("Free USD Balance: %.2f", freeBalance)
 	if freeBalance < 10 {
 		color.Red("At least 10$ needed")
 		os.Exit(0)
