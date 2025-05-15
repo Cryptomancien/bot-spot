@@ -1,6 +1,13 @@
 package commands
 
 import (
+	// "fmt"
+	// "github.com/fatih/color"
+	// "log"
+	// "main/database"
+	// "os"
+	// "strconv"
+	// "strings"
 	"fmt"
 	"github.com/fatih/color"
 	"log"
@@ -11,22 +18,20 @@ import (
 )
 
 func Cancel() {
-	lastArg := GetLastArg()
-	delimiter := "="
+	lastArg := os.Args[2]
 
-	_, numberString, found := strings.Cut(lastArg, delimiter)
-	if !found {
-		log.Fatal("Could not find delimiter")
-	}
-
-	idInt, err := strconv.Atoi(numberString)
+	idInt, err := strconv.Atoi(lastArg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Cancelling", idInt)
+	color.Yellow("Cancelling %d", idInt)
 
 	document := database.GetByIdInt(idInt)
+	if document == nil {
+		color.Red("No document found")
+		return
+	}
 
 	status := document.Get("status").(string)
 	exchange := document.Get("exchange").(string)
@@ -58,9 +63,9 @@ func Cancel() {
 
 	res, err := client.CancelOrder(orderIdToCancel)
 	if err != nil {
+		fmt.Println(string(res))
 		return
 	}
-	fmt.Println(string(res))
 
 	database.DeleteByIdInt(int32(idInt))
 

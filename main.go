@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"main/commands"
 	"main/database"
-	"regexp"
+	"os"
+	"slices"
 )
 
 func menu() {
@@ -14,8 +15,9 @@ func menu() {
 	fmt.Println("--new			-n		Start new cycle")
 	fmt.Println("--update		-u		Update running cycles")
 	fmt.Println("--server		-s		Start local server")
-	fmt.Println("--cancel		-c		Cancel cycle by id - Example: -c=123")
-	fmt.Println("--auto			-a		Mode auto")
+	fmt.Println("--cancel		-c		Cancel cycle by id - Example: -c 123")
+	//fmt.Println("--auto			-a		Mode auto")
+	fmt.Println("--clear 		-cl		Clear range (start end) - Example: -cl 12 36")
 	fmt.Println("")
 }
 
@@ -28,20 +30,29 @@ func initialize() {
 func main() {
 	initialize()
 
-	lastArg := commands.GetLastArg()
-	switch lastArg {
+	args := os.Args[1:]
 
-	case "--new", "-n":
-		commands.New()
-	case "--update", "-u":
-		commands.Update()
-	case regexp.MustCompile(`^--cancel=(\d+)$`).FindString(lastArg), regexp.MustCompile(`^-c=(\d+)$`).FindString(lastArg):
-		commands.Cancel()
-	case "--auto", "-a":
-		commands.Auto()
-	case "--server", "-s":
-		commands.Server()
-	default:
-		menu()
+	actions := map[string]func(){
+		"--new":    commands.New,
+		"-n":       commands.New,
+		"--update": commands.Update,
+		"-u":       commands.Update,
+		"--server": commands.Server,
+		"-s":       commands.Server,
+		"--cancel": commands.Cancel,
+		"-c":       commands.Cancel,
+		"--auto":   commands.Auto,
+		"-a":       commands.Auto,
+		"--clear":  commands.Clear,
+		"-cl":      commands.Clear,
 	}
+
+	for key, action := range actions {
+		if slices.Contains(args, key) {
+			action()
+			return
+		}
+	}
+
+	menu()
 }

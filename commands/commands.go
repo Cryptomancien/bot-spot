@@ -57,13 +57,6 @@ func LoadDotEnv() {
 	}
 }
 
-func GetLastArg() string {
-	args := os.Args
-	argsLen := len(args)
-	lastArg := args[argsLen-1]
-	return lastArg
-}
-
 func CheckPremium() {
 	color.Blue("Checking subscription before...")
 	var customerId string = os.Getenv("CUSTOMER_ID")
