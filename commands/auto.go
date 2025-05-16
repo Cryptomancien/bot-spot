@@ -24,23 +24,27 @@ func dotenvToDuration(key string) time.Duration {
 	return duration
 }
 
-func startNewCycle(wg *sync.WaitGroup) {
+func startNewCycle(wg *sync.WaitGroup, lock chan struct{}) {
 	defer wg.Done()
 	duration := dotenvToDuration("AUTO_INTERVAL_NEW")
 	color.Magenta("Starting new cycle every %s", duration.String())
 	for range time.Tick(duration) {
+		lock <- struct{}{} // acquire
 		fmt.Println(time.Now().Format(time.RubyDate))
 		New()
+		<-lock // release
 	}
 }
 
-func updateRunningCycles(wg *sync.WaitGroup) {
+func updateRunningCycles(wg *sync.WaitGroup, lock chan struct{}) {
 	defer wg.Done()
 	duration := dotenvToDuration("AUTO_INTERVAL_UPDATE")
 	color.Magenta("Updating running cycles every %s", duration.String())
 	for range time.Tick(duration) {
+		lock <- struct{}{} // acquire
 		fmt.Println(time.Now().Format(time.RubyDate))
 		Update()
+		<-lock // release
 	}
 }
 
@@ -48,10 +52,11 @@ func Auto() {
 	color.Yellow("Starting Auto Mode - CTRL + C to exit")
 
 	var wg sync.WaitGroup
-	wg.Add(2)
+	lock := make(chan struct{}, 1) // channel used as mutex
 
-	go startNewCycle(&wg)
-	go updateRunningCycles(&wg)
+	wg.Add(2)
+	go startNewCycle(&wg, lock)
+	go updateRunningCycles(&wg, lock)
 
 	wg.Wait()
 }
