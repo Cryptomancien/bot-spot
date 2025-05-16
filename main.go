@@ -16,7 +16,7 @@ func menu() {
 	fmt.Println("--update		-u		Update running cycles")
 	fmt.Println("--server		-s		Start local server")
 	fmt.Println("--cancel		-c		Cancel cycle by id - Example: -c 123")
-	//fmt.Println("--auto			-a		Mode auto")
+	fmt.Println("--auto			-a		Mode auto")
 	fmt.Println("--clear 		-cl		Clear range (start end) - Example: -cl 12 36")
 	fmt.Println("")
 }
