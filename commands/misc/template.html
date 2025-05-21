@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Cycles</title>
     <style>
         .completed {
@@ -111,8 +112,26 @@
                         <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .buyPrice }}</td>
                         <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .sellPrice }}</td>
                         <td class="px-4 py-4 text-sm text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .change }}</td>
-                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .buyId }}</td>
-                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ .sellId }}</td>
+                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">
+                            {{ if .buyId }}
+                            <button
+                                    class="bg-blue-500 active:bg-blue-800 hover:bg-blue-700 cursor-pointer text-white text-xs px-2 py-1 rounded transition"
+                                    data-id="{{ .buyId }}" data-exchange="{{ .exchange }}"
+                            >
+                                {{ .buyId }}
+                            </button>
+                            {{ end }}
+                        </td>
+                        <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">
+                            {{ if .sellId }}
+                            <button
+                                    class="bg-red-500 active:bg-red-800 hover:bg-red-700 cursor-pointer text-white text-xs px-2 py-1 rounded transition"
+                                    data-id="{{ .sellId }}" data-exchange="{{ .exchange }}"
+                            >
+                                {{ .sellId }}
+                            </button>
+                            {{ end }}
+                        </td>
                         <td class="px-4 py-4 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap">{{ ._id }}</td>
                     </tr>
                     {{ end }}
@@ -123,5 +142,37 @@
     </div>
 
 </section>
+<script>
+    document.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const target = event.target
+
+            const orderId = target.dataset.id
+            const exchange = target.dataset.exchange
+
+            const response = await fetch('/api/get-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    orderId,
+                    exchange
+                })
+            })
+            if ( ! response.ok) {
+                console.log('error server')
+            }
+
+            const data = await response.json()
+            Swal.fire({
+                title: 'Order Info',
+                html: `<pre style="text-align: left; font-size: 14px;">${JSON.stringify(data, null, 2)}</pre>`,
+                confirmButtonText: 'Close',
+                width: 600
+            })
+        })
+    })
+</script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -127,6 +128,40 @@ func Server() {
 		if err != nil {
 			http.Error(w, "Error rendering template", http.StatusInternalServerError)
 		}
+	})
+
+	mux.HandleFunc("/api/get-order", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		if r.Method != http.MethodPost {
+			http.Error(w, `{"error": "method not allowed"}`, http.StatusMethodNotAllowed)
+			return
+		}
+
+		var data struct {
+			OrderID  string `json:"orderId"`
+			Exchange string `json:"exchange"`
+		}
+
+		err := json.NewDecoder(r.Body).Decode(&data)
+		if err != nil {
+			fmt.Println("Error decoding JSON:", err)
+			http.Error(w, `{"error": "invalid json"}`, http.StatusBadRequest)
+			return
+		}
+
+		client := GetClientByExchange(data.Exchange)
+		order, err := client.GetOrderById(data.OrderID)
+		if err != nil {
+			http.Error(w, `{"error": "order not found"}`, http.StatusNotFound)
+			return
+		}
+
+		_, err = w.Write(order)
+		if err != nil {
+			return
+		}
+
 	})
 
 	err := http.ListenAndServe("localhost:8080", mux)
