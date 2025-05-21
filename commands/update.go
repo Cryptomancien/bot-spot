@@ -69,12 +69,13 @@ func Update() {
 
 				bytes, err := client.CreateOrder("SELL", sellPriceStr, quantityStr)
 				if err != nil {
-					log.Fatal(err)
+					log.Fatalf("Error creating order: %v", err)
 					return
 				}
 				orderId, _, _, err := jsonparser.Get(bytes, "orderId")
 
 				if err != nil {
+					log.Printf("Failed to parse orderId: %v", err)
 					log.Fatal(err)
 				}
 
