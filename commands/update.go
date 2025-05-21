@@ -75,6 +75,7 @@ func Update() {
 				orderId, _, _, err := jsonparser.Get(bytes, "orderId")
 
 				if err != nil {
+					log.Printf("Cycle id %s", idInt)
 					log.Printf("Failed to parse orderId: %v", err)
 					log.Fatal(err)
 				}
