@@ -167,7 +167,7 @@
             const data = await response.json()
             Swal.fire({
                 title: 'Order Info',
-                html: `<pre style="text-align: left; font-size: 14px;">${JSON.stringify(data, null, 2)}</pre>`,
+                html: `<pre style="text-align: left; font-size: 14px;">${JSON.stringify(data, null, 4)}</pre>`,
                 confirmButtonText: 'Close',
                 width: 600
             })
