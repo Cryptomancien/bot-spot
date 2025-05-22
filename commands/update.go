@@ -115,4 +115,5 @@ func Update() {
 			}
 		}
 	}
+	Log("Update complete")
 }

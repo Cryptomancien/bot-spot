@@ -108,5 +108,7 @@ func New() {
 	}
 	database.NewCycle(&cycle)
 
-	color.Green("New Cycle successfully inserted in database:")
+	message := "New Cycle successfully inserted in database"
+	color.Green(message)
+	Log(message)
 }

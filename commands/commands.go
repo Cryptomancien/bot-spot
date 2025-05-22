@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 type ExchangeClient interface {
@@ -123,4 +124,23 @@ func GetClientByExchange(exchangeArg ...string) ExchangeClient {
 	}
 
 	return client
+}
+
+func Log(message string) {
+	logDir := "logs"
+
+	if _, err := os.Stat(logDir); os.IsNotExist(err) {
+		err := os.Mkdir(logDir, 0755)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	logFilename := logDir + "/logs_" + time.Now().Format("2006-01-02") + ".log"
+	logFile, err := os.OpenFile(logFilename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err == nil {
+		log.SetOutput(logFile)
+	}
+
+	log.Println(message)
 }
