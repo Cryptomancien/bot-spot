@@ -6,6 +6,7 @@ import (
 	"github.com/fatih/color"
 	"log"
 	"main/database"
+	"os"
 	"strconv"
 )
 
@@ -32,7 +33,16 @@ func Update() {
 
 		if status == "buy" {
 			order, _ := client.GetOrderById((buyId).(string))
-			isFilled := client.IsFilled(string(order))
+			isFilled, err := client.IsFilled(string(order))
+			if err != nil {
+				color.Red("Error found on cycle %d (don't worry)\n", idInt)
+				color.Yellow("Try to remove it")
+
+				fmt.Printf("go run . -c %d\n", idInt)
+				fmt.Printf("go run . -cl %d %d\n", idInt, idInt)
+				os.Exit(0)
+			}
+
 			if !isFilled {
 				fmt.Printf("%s %s %s\n",
 					color.YellowString("%d", idInt),
@@ -91,7 +101,15 @@ func Update() {
 			}
 		} else if status == "sell" {
 			order, _ := client.GetOrderById((sellId).(string))
-			isFilled := client.IsFilled(string(order))
+			isFilled, err := client.IsFilled(string(order))
+			if err != nil {
+				color.Red("Error found on cycle %d (don't worry)\n", idInt)
+				color.Yellow("Try to remove it")
+
+				fmt.Printf("go run . -c %d\n", idInt)
+				fmt.Printf("go run . -cl %d %d\n", idInt, idInt)
+				os.Exit(0)
+			}
 
 			if !isFilled {
 				fmt.Printf("%s %s %s\n",

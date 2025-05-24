@@ -175,13 +175,13 @@ func (c *Client) GetOrderById(id string) ([]byte, error) {
 	return body, nil
 }
 
-func (c *Client) IsFilled(order string) bool {
+func (c *Client) IsFilled(order string) (bool, error) {
 	status, err := jsonparser.GetString([]byte(order), "status")
 	if err != nil {
-		log.Fatal(err)
+		return false, fmt.Errorf("failed to parse order status: %w", err)
 	}
 
-	return status == "FILLED"
+	return status == "FILLED", nil
 }
 
 func (c *Client) CancelOrder(orderID string) ([]byte, error) {

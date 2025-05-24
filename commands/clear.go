@@ -30,6 +30,13 @@ func Clear() {
 	start, _ := strconv.Atoi(startStr)
 	end, _ := strconv.Atoi(endStr)
 
+	if start == end {
+		color.Yellow("Delete one cycle %d", start)
+		database.DeleteByIdInt(int32(start))
+		color.Green("Cycle %d successfully deleted", start)
+		return
+	}
+
 	r := makeRange(start, end)
 
 	for i := range r {

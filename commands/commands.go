@@ -23,7 +23,7 @@ type ExchangeClient interface {
 	SetBaseURL(url string)
 	CreateOrder(side, price, quantity string) ([]byte, error)
 	GetOrderById(id string) ([]byte, error)
-	IsFilled(id string) bool
+	IsFilled(id string) (bool, error)
 	CancelOrder(orderID string) ([]byte, error)
 }
 
