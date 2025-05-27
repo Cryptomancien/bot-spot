@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
+	"github.com/ostafen/clover"
 	"io"
 	"log"
 	"main/exchanges/mexc"
@@ -143,4 +144,17 @@ func Log(message string) {
 	}
 
 	log.Println(message)
+}
+
+func CalcAbsoluteGainByCycle(cycle *clover.Document) float64 {
+
+	quantity, _ := cycle.Get("quantity").(float64)
+	buyPrice, _ := cycle.Get("buyPrice").(float64)
+	sellPrice, _ := cycle.Get("sellPrice").(float64)
+
+	buyTotal := quantity * buyPrice
+	sellTotal := quantity * sellPrice
+	gain := sellTotal - buyTotal
+
+	return gain
 }

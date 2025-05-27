@@ -41,7 +41,7 @@ func Export() {
 	// Write header
 	header := []string{
 		"IdInt", "Exchange", "Status", "Quantity",
-		"BuyPrice", "SellPrice", "Gain", "BuyId", "SellId", "_id",
+		"BuyPrice", "SellPrice", "Gain USD", "BuyId", "SellId", "_id",
 	}
 	if err := writer.Write(header); err != nil {
 		panic(fmt.Errorf("failed to write header: %w", err))
@@ -57,7 +57,9 @@ func Export() {
 			fmt.Sprintf("%v", cycle.Get("quantity")),
 			fmt.Sprintf("%v", cycle.Get("buyPrice")),
 			fmt.Sprintf("%v", cycle.Get("sellPrice")),
-			fmt.Sprintf("%v", cycle.Get("gain")),
+
+			fmt.Sprintf("%v", CalcAbsoluteGainByCycle(cycle)),
+
 			fmt.Sprintf("%v", cycle.Get("buyId")),
 			fmt.Sprintf("%v", cycle.Get("sellId")),
 			fmt.Sprintf("%v", cycle.Get("_id")),
