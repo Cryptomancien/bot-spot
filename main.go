@@ -18,7 +18,7 @@ func menu() {
 	fmt.Println("--cancel		-c		Cancel cycle by id - Example: -c 123")
 	fmt.Println("--auto			-a		Mode auto")
 	fmt.Println("--clear 		-cl		Clear range (start end) - Example: -cl 12 36")
-	fmt.Println("--export		-e		Export history to CSV file")
+	fmt.Println("--export		-e		Export CSV file")
 	fmt.Println("")
 }
 

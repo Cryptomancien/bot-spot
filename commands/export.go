@@ -3,6 +3,7 @@ package commands
 import (
 	"encoding/csv"
 	"fmt"
+	"github.com/fatih/color"
 	"main/database"
 	"os"
 	"path/filepath"
@@ -20,6 +21,9 @@ func Export() {
 
 	// Create CSV file in the "exports" folder
 	fileName := fmt.Sprintf("exports/%s.csv", timestamp)
+
+	color.Yellow("Export data to CSV file: " + fileName)
+
 	file, err := os.Create(filepath.Clean(fileName))
 	if err != nil {
 		panic(fmt.Errorf("failed to create file: %w", err))
@@ -34,10 +38,34 @@ func Export() {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	// Get cycles from database
-	cycles := database.List()
-	if len(cycles) == 0 {
-		return // nothing to write
+	// Write header
+	header := []string{
+		"IdInt", "Exchange", "Status", "Quantity",
+		"BuyPrice", "SellPrice", "Gain", "BuyId", "SellId", "_id",
+	}
+	if err := writer.Write(header); err != nil {
+		panic(fmt.Errorf("failed to write header: %w", err))
 	}
 
+	// Write each row
+	cycles := database.List()
+	for _, cycle := range cycles {
+		row := []string{
+			fmt.Sprintf("%v", cycle.Get("idInt")),
+			fmt.Sprintf("%v", cycle.Get("exchange")),
+			fmt.Sprintf("%v", cycle.Get("status")),
+			fmt.Sprintf("%v", cycle.Get("quantity")),
+			fmt.Sprintf("%v", cycle.Get("buyPrice")),
+			fmt.Sprintf("%v", cycle.Get("sellPrice")),
+			fmt.Sprintf("%v", cycle.Get("gain")),
+			fmt.Sprintf("%v", cycle.Get("buyId")),
+			fmt.Sprintf("%v", cycle.Get("sellId")),
+			fmt.Sprintf("%v", cycle.Get("_id")),
+		}
+
+		if err := writer.Write(row); err != nil {
+			panic(fmt.Errorf("failed to write row: %w", err))
+		}
+	}
+	color.Green("Successfully Export data to CSV file: " + fileName)
 }
