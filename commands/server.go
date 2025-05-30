@@ -3,6 +3,7 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/fatih/color"
 	"html/template"
 	"log"
 	"main/database"
@@ -31,7 +32,8 @@ func getPage(r *http.Request) int {
 func Server() {
 	CheckPremium()
 
-	fmt.Println("http://localhost:8080")
+	fmt.Println("Open browser then go to http://localhost:8080")
+	color.Magenta("\nCtrl + C to close the server")
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
