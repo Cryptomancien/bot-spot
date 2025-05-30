@@ -18,6 +18,12 @@ import (
 )
 
 func Cancel() {
+	if len(os.Args) < 3 {
+		color.Red("Id required")
+		color.Cyan("go run . -c 34")
+		os.Exit(1)
+	}
+
 	lastArg := os.Args[2]
 
 	idInt, err := strconv.Atoi(lastArg)
