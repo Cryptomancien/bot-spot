@@ -32,7 +32,9 @@ func getPage(r *http.Request) int {
 func Server() {
 	CheckPremium()
 
-	fmt.Println("Open browser then go to http://localhost:8080")
+	const address = "localhost:8080"
+
+	fmt.Println("Open browser then go to " + address)
 	color.Magenta("\nCtrl + C to close the server")
 	mux := http.NewServeMux()
 
@@ -166,7 +168,7 @@ func Server() {
 
 	})
 
-	err := http.ListenAndServe("localhost:8080", mux)
+	err := http.ListenAndServe(address, mux)
 	if err != nil {
 		log.Fatal(err)
 	}
