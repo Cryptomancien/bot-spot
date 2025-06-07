@@ -41,7 +41,7 @@ func TestClient_GetOrderById(t *testing.T) {
 
 	fmt.Println(orderJSON)
 
-	isFilled := client.IsFilled(orderJSON)
+	isFilled, _ := client.IsFilled(orderJSON)
 	fmt.Println("is filled:", isFilled)
 }
 
