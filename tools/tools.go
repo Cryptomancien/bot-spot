@@ -31,8 +31,12 @@ func Telegram(message string) {
 	data.Set("chat_id", chatId)
 	data.Set("text", message)
 
-	_, err := httpPostForm(endpoint, data)
+	response, err := httpPostForm(endpoint, data)
 	if err != nil {
 		log.Println("Error sending Telegram message:", err)
+	}
+
+	if response.StatusCode != 200 {
+		log.Println("Error sending Telegram message:", response.Status)
 	}
 }
