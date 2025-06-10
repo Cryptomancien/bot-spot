@@ -6,6 +6,7 @@ import (
 	"github.com/fatih/color"
 	"log"
 	"main/database"
+	"main/tools"
 	"math"
 	"os"
 	"strconv"
@@ -106,9 +107,21 @@ func New() {
 		SellPrice: sellPrice,
 		SellId:    "",
 	}
-	database.NewCycle(&cycle)
+	docId := database.NewCycle(&cycle)
 
 	message := "New Cycle successfully inserted in database"
 	color.Green(message)
 	Log(message)
+
+	if os.Getenv("TELEGRAM") == "1" {
+		doc := database.GetById(docId)
+		idInt := doc.Get("idInt")
+
+		var message = ""
+		message += fmt.Sprintf("ℹ️ New Cycle: %d \n", idInt)
+		message += fmt.Sprintf("✨ Quantity: %.6f \n", newCycleBTC)
+		message += fmt.Sprintf("📉 Buy Price: %.2f \n", buyPrice)
+		message += fmt.Sprintf("📈 Sell Price: %.2f \n", sellPrice)
+		tools.Telegram(message)
+	}
 }

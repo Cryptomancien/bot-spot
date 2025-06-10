@@ -122,7 +122,7 @@ func PrepareIdInt() int32 {
 	return int32(nextId)
 }
 
-func NewCycle(cycle *Cycle) {
+func NewCycle(cycle *Cycle) string {
 	idInt := PrepareIdInt()
 	exchange := cycle.Exchange
 	status := cycle.Status
@@ -143,12 +143,10 @@ func NewCycle(cycle *Cycle) {
 	doc.Set("sellId", sellId)
 
 	db := GetDB()
-	_, err := db.InsertOne(CollectionName, doc)
+	docId, err := db.InsertOne(CollectionName, doc)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	//fmt.Println("docId:", docId)
 
 	defer func(db *clover.DB) {
 		err := db.Close()
@@ -157,6 +155,8 @@ func NewCycle(cycle *Cycle) {
 			log.Fatal(err)
 		}
 	}(db)
+
+	return docId
 }
 
 func GetById(id string) *clover.Document {
