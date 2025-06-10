@@ -137,7 +137,7 @@ func Update() {
 					message += fmt.Sprintf("✅ Cycle %d completed \n", idInt)
 					message += fmt.Sprintf("📉 Buy Price: %.2f \n", buyPrice)
 					message += fmt.Sprintf("📈 Sell Price: %.2f \n", sellPrice)
-					message += fmt.Sprintf("💰 Gain: %.2f%% \n", totalSellUSD-totalBuyUSD)
+					message += fmt.Sprintf("💰 Gain: $ %.2f \n", totalSellUSD-totalBuyUSD)
 					tools.Telegram(message)
 				}
 			}
