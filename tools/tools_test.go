@@ -16,9 +16,9 @@ func TestTelegram(t *testing.T) {
 	}
 
 	var message = ""
-	message += fmt.Sprintf("✅ Cycle 12 completed \n")
-	message += fmt.Sprintf("📉 Buy Price: 98000 \n")
-	message += fmt.Sprintf("📈 Sell Price: 102000 \n")
-	message += fmt.Sprintf("💰 Gain: 4000$ \n")
+	message += fmt.Sprintf("✅ Cycle 12 completed \n\n")
+	message += fmt.Sprintf("📉 Buy Price: 98000 \n\n")
+	message += fmt.Sprintf("📈 Sell Price: 102000 \n\n")
+	message += fmt.Sprintf("💰 Gain: 4000$ \n\n")
 	Telegram(message)
 }
