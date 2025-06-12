@@ -8,6 +8,7 @@ import (
 	"log"
 	"main/database"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -29,10 +30,17 @@ func getPage(r *http.Request) int {
 	return page
 }
 
+func getAddressServer() string {
+	if os.Getenv("SERVER_ADDRESS") != "" {
+		return os.Getenv("SERVER_ADDRESS")
+	}
+	return "localhost:8080"
+}
+
 func Server() {
 	MainMiddleware()
 
-	const address = "localhost:8080"
+	var address = getAddressServer()
 
 	fmt.Println("Open browser then go to " + address)
 	color.Magenta("\nCtrl + C to close the server")
