@@ -12,7 +12,7 @@ import (
 )
 
 func Update() {
-	CheckPremium()
+	MainMiddleware()
 	client := GetClientByExchange()
 
 	lastPrice := client.GetLastPriceBTC()

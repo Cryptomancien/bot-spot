@@ -59,7 +59,7 @@ func LoadDotEnv() {
 	}
 }
 
-func CheckPremium() {
+func MainMiddleware() {
 	color.Blue("Checking subscription before...")
 	var customerId string = os.Getenv("CUSTOMER_ID")
 

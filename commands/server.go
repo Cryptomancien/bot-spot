@@ -30,7 +30,7 @@ func getPage(r *http.Request) int {
 }
 
 func Server() {
-	CheckPremium()
+	MainMiddleware()
 
 	const address = "localhost:8080"
 

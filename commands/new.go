@@ -29,7 +29,7 @@ func FormatSmallFloat(quantity float64) string {
 }
 
 func New() {
-	CheckPremium()
+	MainMiddleware()
 
 	percent := os.Getenv("PERCENT")
 
