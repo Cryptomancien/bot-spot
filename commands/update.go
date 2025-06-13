@@ -13,7 +13,9 @@ import (
 
 func Update() {
 	MainMiddleware()
+
 	client := GetClientByExchange()
+	client.CheckConnection()
 
 	lastPrice := client.GetLastPriceBTC()
 	//fmt.Println("Last price:", lastPrice)
