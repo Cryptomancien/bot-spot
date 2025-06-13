@@ -37,7 +37,7 @@ func New() {
 	buyOffset = math.Abs(buyOffset)
 
 	sellOffset, _ := strconv.ParseFloat(os.Getenv("SELL_OFFSET"), 64)
-	sellOffset = math.Abs(sellOffset)
+	//sellOffset = math.Abs(sellOffset)
 
 	client := GetClientByExchange()
 
