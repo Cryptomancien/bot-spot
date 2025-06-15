@@ -38,6 +38,7 @@ func Update() {
 			order, _ := client.GetOrderById((buyId).(string))
 			isFilled, err := client.IsFilled(string(order))
 			if err != nil {
+				log.Println(err.Error())
 				color.Red("Error found on cycle %d (don't worry)\n", idInt)
 				color.Yellow("Try to remove it")
 
