@@ -147,4 +147,5 @@ func Update() {
 		}
 	}
 	Log("Update complete")
+	Export(false)
 }

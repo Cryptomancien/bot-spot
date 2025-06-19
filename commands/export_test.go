@@ -5,5 +5,5 @@ import (
 )
 
 func TestExport(t *testing.T) {
-	Export()
+	Export(true)
 }

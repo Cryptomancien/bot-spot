@@ -8,7 +8,9 @@ import (
 	"log"
 	"main/database"
 	"os"
+	"path"
 	"path/filepath"
+	"runtime"
 	"time"
 )
 
@@ -24,12 +26,20 @@ func fileNamePrefix() string {
 	return filePrefix
 }
 
-func ToCSV() {
+func RootDir() string {
+	_, b, _, _ := runtime.Caller(0)
+	d := path.Join(path.Dir(b))
+	return filepath.Dir(d)
+}
+
+func ToCSV(displayLogs bool) {
+
 	fileName := fileNamePrefix() + ".csv"
+	if displayLogs {
+		color.Yellow("Export data to CSV file: " + fileName)
+	}
 
-	color.Yellow("Export data to CSV file: " + fileName)
-
-	file, err := os.Create(filepath.Clean(fileName))
+	file, err := os.Create(RootDir() + "/" + filepath.Clean(fileName))
 	if err != nil {
 		panic(fmt.Errorf("failed to create file: %w", err))
 	}
@@ -74,11 +84,14 @@ func ToCSV() {
 			panic(fmt.Errorf("failed to write row: %w", err))
 		}
 	}
-	color.Green("Successfully Export data to CSV file: " + fileName)
+	if displayLogs {
+		color.Green("Successfully Export data to CSV file: " + fileName)
+	}
 }
 
-func ToJSON() {
+func ToJSON(displayLogs bool) {
 	fileName := fileNamePrefix() + ".json"
+	fileName = RootDir() + "/" + filepath.Clean(fileName)
 
 	db := database.GetDB()
 	defer func(db *clover.DB) {
@@ -92,10 +105,13 @@ func ToJSON() {
 	if err != nil {
 		log.Fatal("Can't export collection to JSON file: " + fileName)
 	}
-	color.Green("Successfully Export data to JSON file: " + fileName)
+
+	if displayLogs {
+		color.Green("Successfully Export data to JSON file: " + fileName)
+	}
 }
 
-func Export() {
-	ToCSV()
-	ToJSON()
+func Export(displayLogs bool) {
+	ToCSV(displayLogs)
+	ToJSON(displayLogs)
 }

@@ -113,6 +113,9 @@ func New() {
 	color.Green(message)
 	Log(message)
 
+	// Save data without logs
+	Export(false)
+
 	if os.Getenv("TELEGRAM") == "1" {
 		doc := database.GetById(docId)
 		idInt := doc.Get("idInt")

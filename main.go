@@ -46,8 +46,8 @@ func main() {
 		"-a":       commands.Auto,
 		"--clear":  commands.Clear,
 		"-cl":      commands.Clear,
-		"--export": commands.Export,
-		"-e":       commands.Export,
+		"--export": func() { commands.Export(true) },
+		"-e":       func() { commands.Export(true) },
 	}
 
 	for key, action := range actions {
