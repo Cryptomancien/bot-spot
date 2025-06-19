@@ -10,7 +10,7 @@ import (
 
 const CollectionName = "cycles"
 
-func InitDatabase() {
+func InitDatabase() (*clover.DB, error) {
 	databasePath := GetDatabasePath()
 	db, _ := clover.Open(databasePath)
 	collectionAlreadyExists, _ := db.HasCollection(CollectionName)
@@ -23,9 +23,11 @@ func InitDatabase() {
 	defer func(db *clover.DB) {
 		err := db.Close()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("Error db.Close: %s", err)
 		}
 	}(db)
+
+	return db, nil
 }
 
 func GetDatabasePath() string {

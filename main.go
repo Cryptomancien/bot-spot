@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/ostafen/clover"
 	"main/commands"
 	"main/database"
 	"os"
@@ -22,14 +23,29 @@ func menu() {
 	fmt.Println("")
 }
 
-func initialize() {
+func initialize() error {
 	commands.CreateConfigFileIfNotExists()
 	commands.LoadDotEnv()
-	database.InitDatabase()
+
+	db, err := database.InitDatabase()
+	if err != nil {
+		panic(err)
+	}
+	defer func(db *clover.DB) {
+		err := db.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(db)
+
+	return nil
 }
 
 func main() {
-	initialize()
+	err := initialize()
+	if err != nil {
+		panic("Error initializing database: %v")
+	}
 
 	args := os.Args[1:]
 
