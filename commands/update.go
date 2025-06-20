@@ -108,6 +108,7 @@ func Update() {
 			isFilled, err := client.IsFilled(string(order))
 			if err != nil {
 				color.Red("Error found on cycle %d (don't worry)\n", idInt)
+				log.Println(err)
 				color.Yellow("Try to remove it")
 
 				fmt.Printf("go run . -c %d\n", idInt)
