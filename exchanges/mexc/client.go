@@ -199,3 +199,18 @@ func (c *Client) CancelOrder(orderID string) ([]byte, error) {
 	color.Green("Order %s canceled successfully", orderID)
 	return body, nil
 }
+
+func (c *Client) GetOpenOrders() ([]byte, error) {
+	timestamp := strconv.FormatInt(time.Now().UnixMilli(), 10)
+
+	queryString := fmt.Sprintf("symbol=BTCUSDC&timestamp=%s", timestamp)
+	signature := c.signRequest(queryString)
+	signedQuery := fmt.Sprintf("%s&signature=%s", queryString, signature)
+
+	body, err := c.sendRequest("GET", "/api/v3/openOrders", signedQuery)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching open orders: %v", err)
+	}
+
+	return body, nil
+}

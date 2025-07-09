@@ -26,6 +26,7 @@ type ExchangeClient interface {
 	GetOrderById(id string) ([]byte, error)
 	IsFilled(id string) (bool, error)
 	CancelOrder(orderID string) ([]byte, error)
+	GetOpenOrders() ([]byte, error)
 }
 
 const ConfigFilename = "bot.conf"
