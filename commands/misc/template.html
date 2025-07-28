@@ -187,10 +187,10 @@
 
     // Filter
     const filterSelect = document.getElementById('statusFilter')
+    const rows = document.querySelectorAll('tbody tr')
 
     filterSelect.addEventListener('change', () => {
         const selected = filterSelect.value
-        const rows = document.querySelectorAll('tbody tr')
 
         rows.forEach(row => {
             const hasClass = row.classList.contains(selected)
@@ -201,6 +201,24 @@
             }
         })
     })
+
+    // Counts
+    const counts = {
+        buy: 0,
+        sell: 0,
+        completed: 0,
+        total: 0
+    }
+    rows.forEach(row => {
+        const status = row.classList[0]
+        counts[status]++
+        counts.total++
+    })
+
+    document.querySelector('option[value="all"]').innerText = `All (${counts.total})`
+    document.querySelector('option[value="buy"]').innerText = `Buy (${counts.buy})`
+    document.querySelector('option[value="sell"]').innerText = `Sell (${counts.sell})`
+    document.querySelector('option[value="completed"]').innerText = `Completed (${counts.completed})`
 </script>
 </body>
 </html>
