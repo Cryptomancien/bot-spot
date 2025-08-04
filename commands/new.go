@@ -46,6 +46,7 @@ func New() {
 	freeBalance := client.GetBalanceUSD()
 	color.Cyan("Free USD Balance: %.2f", freeBalance)
 	if freeBalance < 10 {
+		tools.Telegram("At least 10$ needed")
 		color.Red("At least 10$ needed")
 		os.Exit(0)
 	}
@@ -89,11 +90,13 @@ func New() {
 	body, err := client.CreateOrder("BUY", buyPriceStr, newCycleBTCFormated)
 	if err != nil {
 		color.Red("Order failed:", err)
+		tools.Telegram("Order failed: " + err.Error())
 		os.Exit(0)
 	}
 
 	orderId, _, _, err := jsonparser.Get(body, "orderId")
 	if err != nil {
+		tools.Telegram("Order failed: " + err.Error())
 		log.Fatal(err)
 	}
 
