@@ -118,7 +118,19 @@ func PrepareIdInt() int32 {
 		Direction: -1,
 	}).Limit(1).FindFirst()
 
-	lastId := (lastDoc.Get("idInt")).(int64)
+	// Handle the case where idInt might be stored as float64
+	var lastId int64
+	idValue := lastDoc.Get("idInt")
+
+	switch v := idValue.(type) {
+	case int64:
+		lastId = v
+	case float64:
+		lastId = int64(v)
+	default:
+		log.Fatalf("Unexpected type for idInt: %T", idValue)
+	}
+
 	nextId := lastId + 1
 
 	return int32(nextId)

@@ -24,7 +24,22 @@ func Update() {
 	for _, doc := range docs {
 
 		id := doc.Get("_id")
-		idInt := doc.Get("idInt")
+		idIntRaw := doc.Get("idInt")
+		// Convert idInt to int for proper formatting
+		var idInt int
+		switch v := idIntRaw.(type) {
+		case int:
+			idInt = v
+		case int32:
+			idInt = int(v)
+		case int64:
+			idInt = int(v)
+		case float64:
+			idInt = int(v)
+		default:
+			log.Printf("Unexpected type for idInt: %T", idIntRaw)
+			idInt = 0
+		}
 		idString := id.(string)
 
 		status := doc.Get("status")
@@ -89,7 +104,7 @@ func Update() {
 				orderId, _, _, err := jsonparser.Get(bytes, "orderId")
 
 				if err != nil {
-					log.Printf("Cycle id %s", idInt)
+					log.Printf("Cycle id %d", idInt)
 					log.Printf("Failed to parse orderId: %v", err)
 					log.Fatal(err)
 				}
