@@ -9,9 +9,11 @@ import (
 	"slices"
 )
 
+const version = "v3.0.7"
+
 func menu() {
 	fmt.Println("")
-	fmt.Println("Cryptomancien - BOT SPOT - v3.0.6 - beta")
+	fmt.Println("Cryptomancien - BOT SPOT - " + version + " - beta")
 	fmt.Println("")
 	fmt.Println("--new			-n		Start new cycle")
 	fmt.Println("--update		-u		Update running cycles")
