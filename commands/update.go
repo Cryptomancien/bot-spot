@@ -9,6 +9,7 @@ import (
 	"main/tools"
 	"os"
 	"strconv"
+	"time"
 )
 
 func Update() {
@@ -161,6 +162,9 @@ func Update() {
 				}
 			}
 		}
+
+		// Add a sleeper to ensure lock/unlock works fine
+		time.Sleep(50 * time.Millisecond)
 	}
 	Log("Update complete")
 	Export(false)
