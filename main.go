@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/ostafen/clover"
 	"main/commands"
@@ -30,6 +31,17 @@ func initialize() error {
 	commands.CreateConfigFileIfNotExists()
 	commands.LoadDotEnv()
 
+	// Create exports files if not exists
+	path := "exports"
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(path, os.ModePerm)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	// Init db
 	db, err := database.InitDatabase()
 	if err != nil {
 		panic(err)
